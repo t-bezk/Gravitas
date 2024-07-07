@@ -11,7 +11,7 @@
 /*
 	C. Tomas Bezkorowajnyj 2024 | All Rights Reserved
 	Github: @Attempt4
-	Indev v. 0.1
+	Indev v. 0.1 g
 
 */
 
