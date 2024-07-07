@@ -1,0 +1,98 @@
+
+/*--QQQQQQQQQQ--QQQQQQQQQQQ--QQQQQQQQQQQ--QQ-------QQ--QQQQQQQQQQQ--QQQQQQQQQQQ--QQQQQQQQQQQ--QQQQQQQQQQQ--*/
+/*--QQQQQQQQQQ--QQQQQQQQQQQ--QQQQQQQQQQQ--QQ-------QQ--QQQQQQQQQQQ--QQQQQQQQQQQ--QQQQQQQQQQQ--QQQQQQQQQQQ--*/
+/*--QQ----------QQ-------QQ--QQ-------QQ--QQ-------QQ------QQQ----------QQQ------QQ-------QQ--QQ-----------*/
+/*--QQ---QQQQQ--QQQQQQQQQQ---QQQQQQQQQQQ--QQQ-----QQQ------QQQ----------QQQ------QQQQQQQQQQQ--QQQQQQQQQQQ--*/
+/*--QQ---QQQQQ--QQQQQQQQQQ---QQQQQQQQQQQ---QQ-----QQ-------QQQ----------QQQ------QQQQQQQQQQQ--QQQQQQQQQQQ--*/
+/*--QQ------QQ--QQ------QQQ--QQ-------QQ---QQ-----QQ-------QQQ----------QQQ------QQ-------QQ-----------QQ--*/
+/*--QQQQQQQQQQ--QQ-------QQ--QQ-------QQ----QQ---QQ----QQQQQQQQQQQ------QQQ------QQ-------QQ--QQQQQQQQQQQ--*/
+/*--QQQQQQQQQQ--QQ-------QQ--QQ-------QQ-----QQQQQ-----QQQQQQQQQQQ------QQQ------QQ-------QQ--QQQQQQQQQQQ--*/
+
+/*
+	C. Tomas Bezkorowajnyj 2024 | All Rights Reserved
+	Github: @Attempt4
+	Indev v. 0.1
+
+*/
+
+
+
+/*--Includes--*/
+
+#define NOMINMAX
+#include <Windows.h>
+#include <iostream>
+
+
+/*--preprocessor--*/
+
+#define DA_DEBUG_MODE 1
+
+#if DA_DEBUG_MODE == 1
+#define Log(x) std::cout << x << std::endl
+#define Print(x) std::cout << x << std::endl
+#define DA_HIDE_CONSOLE
+#define DA_END_PROCESS std::cin.get()
+#else 
+#define Log(x)
+#define Print(x)
+#define DA_HIDE_CONSOLE ::ShowWindow(::GetConsoleWindow(), SW_HIDE)
+#define DA_END_PROCESS 
+#endif
+
+
+/*--Call header file prerequisites--*/
+#include "trajectory.h"
+
+
+int main()
+{
+	sf::Event event;
+	sf::Clock clock;
+	sf::Clock delay;
+	sf::View view;
+	
+	view.setViewport(sf::FloatRect(0, 0, 1.0f, 1.0f));
+	view.setSize(screen.x, screen.y);
+
+	//Window.setFramerateLimit(60);
+	Window.setKeyRepeatEnabled(false);
+
+
+	//Body definitions
+	ellipse ellipse;
+	bodymanager* bm;
+	bm = new bodymanager;
+
+	while (Window.isOpen())
+	{
+		
+		while (Window.pollEvent(event))
+		{
+			switch (event.type)
+			{
+			case sf::Event::Closed:
+			{
+				Window.close();
+				break;
+			}
+			}
+		}
+
+		view.setViewport(sf::FloatRect(bm->com().x / screen.x, bm->com().y / screen.y, 1.0f, 1.0f));
+
+		/*--Draw--*/
+		Window.setView(view);
+		bm->multireact();
+		bm->draw(Window);
+		ellipse.draw(Window, bm->cele[1].p, bm->cele[1].ec, bm->cele[1].prog_angle,0.f);
+
+		/*--Display--*/
+		Window.display();
+		Window.clear();
+	}
+
+	delete bm;
+
+	return 0;
+}
