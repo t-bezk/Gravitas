@@ -11,14 +11,13 @@
 /*
 	C. Tomas Bezkorowajnyj 2024 | All Rights Reserved
 	Github: @Attempt4
-	Indev v. 0.1 g
+	Indev v. 0.1 git
 
 */
 
 
 
 /*--Includes--*/
-
 #define NOMINMAX
 #include <Windows.h>
 #include <iostream>
@@ -64,6 +63,8 @@ int main()
 	bodymanager* bm;
 	bm = new bodymanager;
 
+	float angleEE = 0.f;
+
 	while (Window.isOpen())
 	{
 		
@@ -81,11 +82,21 @@ int main()
 
 		view.setViewport(sf::FloatRect(bm->com().x / screen.x, bm->com().y / screen.y, 1.0f, 1.0f));
 
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+			angleEE -= 0.01f;
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+			angleEE += 0.01f;
+
+
+		/*--Time Step Multiple Body Interactions--*/
+		bm->multireact();
+
 		/*--Draw--*/
 		Window.setView(view);
-		bm->multireact();
 		bm->draw(Window);
-		ellipse.draw(Window, bm->cele[1].p, bm->cele[1].ec, bm->cele[1].prog_angle,0.f);
+		ellipse.draw(Window, bm->cele[1].p, bm->cele[1].ec, bm->cele[1].prog_angle,angleEE);
+
+		//Print(bm->cele[1].prog_angle << ", " << angleEE);
 
 		/*--Display--*/
 		Window.display();

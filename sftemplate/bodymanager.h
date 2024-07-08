@@ -27,8 +27,8 @@ public:
 			cele[0].vel = { 0,0 };
 			cele[0].mass = 10000.f;
 
-			cele[1].pos = { 200,0 };
-			cele[1].vel = { 0,4 };
+			cele[1].pos = { 0,200 };
+			cele[1].vel = { 4,2 };
 			cele[1].mass = 0.1f;
 		}
 

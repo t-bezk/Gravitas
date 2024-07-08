@@ -114,7 +114,7 @@ public:
 			this->angular_progression -= 2 * pi;
 
 		float prAng = ((1 / ecc) * ((ppar / moddist) - 1));
-		if (abs(prAng) == 1)
+		if (abs(prAng) >= 1)
 			prAng *= pi / 2;
 		else
 			prAng = acosf(prAng);
@@ -137,23 +137,8 @@ public:
 
 		//Print
 		if (this->print) {
-			Print(prog_angle);
+			Print(prAng << ", " << (cphi));
 		}
-
-	}
-
-	void callib(vec2 r2, float mass, bool print) {
-		vec2 dist = r2 - this->pos;
-
-		float mu = mass;
-
-		float m = this->mass;
-
-		float moddist = vecmod(dist);
-		float modacc = mu / (moddist * moddist);
-		float angle = atan2f(dist.y, dist.x);
-		this->acc = { this->acc.x + modacc * cos(angle), this->acc.y + modacc * sin(angle) };
-
 
 	}
 
