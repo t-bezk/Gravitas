@@ -56,7 +56,7 @@ int main()
 
 	//Window.setFramerateLimit(60);
 	Window.setKeyRepeatEnabled(false);
-
+	
 
 	//Body definitions
 	ellipse ellipse;
@@ -65,6 +65,8 @@ int main()
 
 	float angleEE = 0.f;
 
+
+	bm->cele[1].reset();
 	while (Window.isOpen())
 	{
 		
@@ -75,6 +77,12 @@ int main()
 			case sf::Event::Closed:
 			{
 				Window.close();
+				break;
+			}
+			case sf::Event::KeyPressed:
+			{
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::R))
+					bm->cele[1].reset();
 				break;
 			}
 			}
@@ -88,13 +96,14 @@ int main()
 			angleEE += 0.01f;
 
 
+
 		/*--Time Step Multiple Body Interactions--*/
 		bm->multireact();
 
 		/*--Draw--*/
 		Window.setView(view);
 		bm->draw(Window);
-		ellipse.draw(Window, bm->cele[1].p, bm->cele[1].ec, bm->cele[1].prog_angle,angleEE);
+		ellipse.draw(Window, bm->cele[1].p, bm->cele[1].ec, bm->cele[1].prog_angle - bm->cele[1].rad_angle - pi);
 
 		//Print(bm->cele[1].prog_angle << ", " << angleEE);
 

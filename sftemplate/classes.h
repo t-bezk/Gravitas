@@ -2,10 +2,10 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/Window.hpp>
+#include <fstream>
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
-#include <fstream>
 #include <Windows.h>
 #include <string>
 #include <chrono>

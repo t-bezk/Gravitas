@@ -13,14 +13,14 @@ public:
 
 	float dt = 0.05f;
 
-	float prog_angle = 0;
-	float angle = 0;
+	float prog_angle = 0.f;
+	float angle = 0.f;
+	float rad_angle = 0.f;
 
 	bool print = false;
 
 	vec2 prevAngs = { 0.f, 0.f };
-
-	bool change_angle = true;
+	vec2 prev2Angs = { 0.f, 0.f };
 
 	float ec = 0;
 	float p = 0;
@@ -57,7 +57,7 @@ public:
 
 		float modacc = mu / (moddist * moddist);
 
-		angle = atan2f(dist.y, dist.x);
+		this->angle = atan2f(dist.y, dist.x);
 
 		this->acc = { this->acc.x + modacc * cos(angle), this->acc.y + modacc * sin(angle) };
 
@@ -66,8 +66,6 @@ public:
 		float rmod = vecmod(this->pos);
 
 		float vmod = vecmod(this->vel);
-
-		float dA = 0.5 * rmod * (rmod + vmod * dt);
 
 
 		//Semi-major axis
@@ -113,33 +111,84 @@ public:
 		if (this->angular_progression > 2 * pi)
 			this->angular_progression -= 2 * pi;
 
-		float prAng = ((1 / ecc) * ((ppar / moddist) - 1));
-		if (abs(prAng) >= 1)
-			prAng *= pi / 2;
+		float ct = ( vth0 * (1 - ecc * ecc) * a / h  - 1) / ecc;
+		float st = (vr0 * (1 - ecc * ecc) * a / h) / ecc;
+
+		float th = acosf(ct) - this->angular_progression - pi;
+		float th_a = pi - acosf(ct) - this->angular_progression;
+
+		if (th - prevAngs.x < th_a - prevAngs.y)
+			this->prog_angle = th_a;
 		else
-			prAng = acosf(prAng);
+			this->prog_angle = th;
 
-		float pveSoln = this->angular_progression + prAng + pi;
-		float nveSoln = this->angular_progression - prAng + pi;
+		prevAngs = { th, th_a };
 
-		if (pveSoln - prevAngs.x < nveSoln - prevAngs.y)
-			this->prog_angle = this->angular_progression + prAng + pi;
-		else
-			this->prog_angle = this->angular_progression - prAng + pi;
-
-		prevAngs = { pveSoln, nveSoln };
-
+		this->rad_angle = this->angle + this->angular_progression;
 
 		//Objective Updates
 		this->ec = ecc;
 		this->p = ppar;
+		//this->rad_angle = this->angle + this->angular_progression;
+
+		float r_angle = this->angle + this->angular_progression;
+		float r_angle_a = pi - this->angle - this->angular_progression;
+
+		if (r_angle - prev2Angs.x > r_angle_a - prev2Angs.y)
+			this->prog_angle = r_angle;
+		else
+			this->prog_angle = r_angle_a;
+
+		prev2Angs = { r_angle, r_angle_a };
+
+
 
 
 		//Print
 		if (this->print) {
-			Print(prAng << ", " << (cphi));
+			Print(this->rad_angle);
 		}
 
+	}
+
+	void reset() {
+		std::string dat;
+		std::string appDat;
+		std::ifstream myfile("cel1dat.txt");
+		if (myfile.is_open())
+		{
+
+			while (std::getline(myfile, dat)) {
+				appDat += dat;
+			}
+			myfile.close();
+		}
+
+		std::string celDat[4];
+		int app = 0;
+		for (int i = 0; i < sizeof(appDat) / sizeof(char); i++)
+		{
+			if (appDat[i] == ',')
+				app++;
+			else
+				celDat[app] += appDat[i];
+		}
+
+		ec = 0;
+		p = 0;
+		E = 0;
+		L = 0;
+
+		prog_angle = 0.f;
+		angle = 0.f;
+		rad_angle = 0.f;
+
+		prevAngs = { 0.f, 0.f };
+
+		angular_progression = 0.f;
+
+		this->pos = { std::stof(celDat[0]), std::stof(celDat[1]) };
+		this->vel = { std::stof(celDat[2]), std::stof(celDat[3]) };
 	}
 
 };

@@ -165,6 +165,9 @@
     <ClInclude Include="sysInfo.h" />
     <ClInclude Include="trajectory.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="cel1dat.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
