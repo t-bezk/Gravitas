@@ -15,7 +15,7 @@ public:
 	}
 
 	vec2 parameters(int N, float p, float e, float phi) {
-		float r = p / (1 + e * cos((float)N * pi / 180.f +  + pi + phi));
+		float r = p / (1 + e * cos((float)N * pi / 180.f - phi));
 		return { r * (float)cos((float)N * pi / 180.f ), r * (float)sin((float)N * pi / 180.f ) };
 	}
 

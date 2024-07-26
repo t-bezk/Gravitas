@@ -105,19 +105,11 @@ public:
 
 
 		//Angle Progression
-
-		this->rad_angle = this->angle - this->angular_progression;
-
-
-
-
 		float angVel = vth0 / moddist;
 
 		this->angular_progression += angVel * dt;
 		if (this->angular_progression > 2 * pi)
 			this->angular_progression -= 2 * pi;
-		else if (this->angular_progression < - pi)
-			this->angular_progression += 2 * pi;
 
 		float ct = ( vth0 * (1 - ecc * ecc) * a / h  - 1) / ecc;
 		float st = (vr0 * (1 - ecc * ecc) * a / h) / ecc;
@@ -130,20 +122,31 @@ public:
 		else
 			this->prog_angle = th;
 
-		if (this->prog_angle > pi)
-			this->prog_angle -= 2 * pi;
-		else if (this->prog_angle < - pi)
-			this->prog_angle += 2 * pi;
-
 		prevAngs = { th, th_a };
+
+		this->rad_angle = this->angle + this->angular_progression;
 
 		//Objective Updates
 		this->ec = ecc;
 		this->p = ppar;
+		//this->rad_angle = this->angle + this->angular_progression;
+
+		float r_angle = this->angle + this->angular_progression;
+		float r_angle_a = pi - this->angle - this->angular_progression;
+
+		if (r_angle - prev2Angs.x > r_angle_a - prev2Angs.y)
+			this->prog_angle = r_angle;
+		else
+			this->prog_angle = r_angle_a;
+
+		prev2Angs = { r_angle, r_angle_a };
+
+
+
 
 		//Print
 		if (this->print) {
-			Print(rad_angle);
+			Print(this->rad_angle);
 		}
 
 	}
