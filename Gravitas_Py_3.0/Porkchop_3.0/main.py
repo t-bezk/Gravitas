@@ -20,21 +20,32 @@ from Trajectory_Char import *
 
 from Physics import *
 
+import pathlib
+
+
+
+##  Retrieve local file directory
+dir = pathlib.Path(__file__).parent.resolve()
+
+##  Print local file directory (Debug)
+print(dir)
+
+
 
 ##  Set the path to the image folder
-image_folder = "fig/"
+image_folder = f"{dir}/fig/"
 
 
 
 
 ##  Set the desired output video file name
-output_video_file = "C:/Users/tbezk/Documents/python_code/porkchop_plot_generator/video_output/output_video.mp4"
+output_video_file = f"{dir}/video_output/output_video.mp4"
 
 
 
 
 ## Load JED object planetary data and extract position and velocity data from files
-space_objects = np.loadtxt("space_objects.csv", delimiter=',',skiprows=1,usecols=np.arange(1,7)).T
+space_objects = np.loadtxt(f"{dir}/space_objects.csv", delimiter=',',skiprows=1,usecols=np.arange(1,7)).T
 
 
 
@@ -78,7 +89,7 @@ delete_contents(image_folder)
 
 
 ## Time Loop
-for q in range(100000):
+for q in range(300000):
 
 
     ## Time step orbits of planets by dt
@@ -117,7 +128,7 @@ for q in range(100000):
 
 
         #Save Image to buffer file
-        plt.savefig(f'fig/{q}.png',dpi=300)
+        plt.savefig(f'{dir}/fig/{q}.png',dpi=300)
         plt.close()
 
         
