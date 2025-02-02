@@ -2,7 +2,7 @@
 
 """""""""""""""""""""""""""""""""
 ----------------------------------
-GRAVITAS V.3.0 - Porkchop Plotter
+GRAVITAS V.3.0 - 2 body time-step numerical integrator
 by Tomas Bezkorowajnyj c. February 2025
 ----------------------------------
 """""""""""""""""""""""""""""""""
@@ -46,86 +46,6 @@ output_video_file = f"{dir}/video_output/output_video.mp4"
 
 ## Load JED object planetary data and extract position and velocity data from files
 space_objects = np.loadtxt(f"{dir}/space_objects.csv", delimiter=',',skiprows=1,usecols=np.arange(1,7)).T
-
-
-angle_res = 20
-
-## Define plotting parameters
-E = np.linspace(0.0025,0.01,40)     ##Define as a velocity for now
-phi = np.linspace(0,2*np.pi,angle_res)
-theta = np.linspace(0,np.pi,angle_res)
-
-min_E = np.zeros(len(E))
-
-for E_i in range(len(E)):
-
-    DX=np.zeros((angle_res,angle_res))
-
-    for q1 in range(len(phi)):
-        for q2 in range(len(theta)):
-
-            
-            #   Define vessel
-            k_v_vel = np.array([E[E_i]*np.cos(phi[q1])*np.sin(theta[q2]), E[E_i]*np.sin(phi[q1])*np.sin(theta[q2]), E[E_i]*np.cos(theta[q2])])
-
-
-
-
-            #   Define the vessel position and velocity parameters
-            v_pos = np.array([space_objects[0][2],space_objects[1][2],space_objects[2][2]])
-            v_vel = np.array([space_objects[3][2]+k_v_vel[0],space_objects[4][2]+k_v_vel[1],space_objects[5][2]+k_v_vel[2]])
-            
-
-            
-            
-            ##  Extract initial position and velocity data
-            R = au*np.array([space_objects[0][2],space_objects[1][2],space_objects[2][2]])
-            V = auday*np.array([space_objects[3][2],space_objects[4][2],space_objects[5][2]])
-
-
-
-
-            ##  Get parameters for planets
-            M_par = plotOrbs(3, space_objects)
-
-
-
-
-            ##  Get parameters of spacecraft
-            qq = plotTraj(auday*v_vel,au*v_pos)
-
-
-
-
-            ##  Store min displacement angle for given parameters
-            m_mod_val = np.sqrt(M_par[0]**2 + M_par[1]**2 + M_par[2]**2)
-            s_mod_val = np.sqrt(qq[0]**2 + qq[1]**2 + qq[2]**2)
-            
-            dx_vec = np.abs(m_mod_val - s_mod_val)
-
-            DX[q1][q2] = np.max(dx_vec)
-
-            #print(mod_val)
-            #print("-----")
-    
-    min_E[E_i] = np.min(DX)
-
-    #plt.imshow(DX)
-    #plt.colorbar()
-
-    #plt.show()
-
-plt.plot(E,min_E)
-
-plt.show()
-
-
-g=input()
-
-
-
-
-
 
 
 # Define vessel

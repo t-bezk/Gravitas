@@ -8,13 +8,13 @@ auday = au*1.1574e-5
 
 dt = 100
 
-import math
+import numpy as np
 
 def mag(vec):
     
     a=0
     for i in vec:
         a+=i**2
-    return math.sqrt(a)
+    return np.sqrt(a)
     
     

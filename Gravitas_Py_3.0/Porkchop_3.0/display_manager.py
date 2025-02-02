@@ -46,7 +46,6 @@ def displayOrbit(a,e,i,omega,Omega):
     return np.array([x,y,z])
 
 
-
 if __name__ == "__main__":
     
     print("display_manager.py successfully loaded")
