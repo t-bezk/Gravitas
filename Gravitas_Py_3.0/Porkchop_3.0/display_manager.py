@@ -42,9 +42,6 @@ def displayOrbit(a,e,i,omega,Omega,R):
     y = R21 * x_prime + R22 * y_prime + R23 * z_prime
     z = R31 * x_prime + R32 * y_prime + R33 * z_prime
 
-    # Plot the 3D orbit
-    #ax.plot(x, y, z, label='Orbit')
-    #ax.scatter(R[0],R[1],R[2])
     
     return np.array([x,y,z])
 

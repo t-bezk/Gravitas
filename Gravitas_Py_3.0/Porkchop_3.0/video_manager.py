@@ -53,7 +53,7 @@ def video_manager(image_folder_p, output_video_p, frame_rate_p):
 
 
     ## Finally, delete all residual files from buffer folder
-    delete_contents(image_folder_p)
+    #delete_contents(image_folder_p)
 
 
 

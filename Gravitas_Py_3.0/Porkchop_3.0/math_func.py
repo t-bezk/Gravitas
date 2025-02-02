@@ -6,7 +6,7 @@ au = 1.495979e11
 
 auday = au*1.1574e-5
 
-dt = 60
+dt = 10
 
 import math
 

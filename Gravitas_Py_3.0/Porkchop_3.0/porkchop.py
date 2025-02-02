@@ -2,7 +2,7 @@
 
 """""""""""""""""""""""""""""""""
 ----------------------------------
-GRAVITAS V.3.0 - Gravity Assist Calculator
+GRAVITAS V.3.0 - Porkchop Plotter
 by Tomas Bezkorowajnyj c. February 2025
 ----------------------------------
 """""""""""""""""""""""""""""""""
@@ -51,14 +51,14 @@ space_objects = np.loadtxt(f"{dir}/space_objects.csv", delimiter=',',skiprows=1,
 
 
 # Define vessel
-k_v_vel = np.array([0.000,0.003,0.002])
+k_v_vel = np.array([0.000,0.003,0.010])
 
 
 
 
 #Define the vessel position and velocity parameters
 v_pos = np.array([space_objects[0][2],space_objects[1][2],space_objects[2][2]])
-v_vel = np.array([space_objects[3][2]+k_v_vel[0],space_objects[4][2]+k_v_vel[1],space_objects[5][2]]+k_v_vel[2])
+v_vel = np.array([space_objects[3][2]+k_v_vel[0],space_objects[4][2]+k_v_vel[1],space_objects[5][2]+k_v_vel[2]])
 
 
 
@@ -69,37 +69,37 @@ V = auday*np.array([space_objects[3][2],space_objects[4][2],space_objects[5][2]]
 
 
 
-
-## Specify number of planets to simulate (from inside to out)
-N=4
-
-
-
-
 ## Correctional Matrix filps the orbit projection if facing the wrong way round
 cm = [ 1,1,-1,-1 ]
 
 
 
 
-#Delete buffer file contents
+##  Delete buffer file contents
 delete_contents(image_folder)
 
 
 
+##  Planetary indices of those to be visible
+N = [ 0, 1, 2, 3 ]
+
+
+DX = []
+DV = []
+
+
 
 ## Time Loop
-for q in range(300000):
+for q in range(1,1002):
 
 
     ## Time step orbits of planets by dt
-    for p in range(N):
+    for p in N:
         updatePlanetaryPhysics(p, space_objects)
 
     
     ## Time step vessel trajectory by dt and then store velocity and position vectors in global variable
     vecs = updateVesselPhysics(v_pos,v_vel)
-
 
     v_pos = vecs[0]
     v_vel = vecs[1]
@@ -108,16 +108,17 @@ for q in range(300000):
     ## Frame Capture for every other frame
     if q % 1000 == 0:
         
+        #print(v_pos)
 
         ## Setup Graph
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
 
 
-        ## Plot positions of all N planets
-        for p in range(N):
+       ## Plot positions of all N planets
+        for p in N:
             aw = plotOrbs(p, space_objects)
-            ax.plot(aw[0],cm[p]*aw[1],cm[p]*aw[2],label="orbit")
+            ax.plot(aw[0],aw[1],aw[2],label="orbit")
             ax.scatter(au*space_objects[0][p],au*space_objects[1][p],au*space_objects[2][p])
 
 
@@ -127,10 +128,31 @@ for q in range(300000):
         ax.scatter(au*v_pos[0],au*v_pos[1],au*v_pos[2])
 
 
-        #Save Image to buffer file
-        plt.savefig(f'{dir}/fig/{q}.png',dpi=300)
+
+        ## Save Image to buffer file
+        plt.savefig(f'{dir}/fig/im{int(q/1000)}.png',dpi=300)
+
+        plt.show()
+
         plt.close()
+
+
+        ## Record displacement data
+        mars_pos = np.sqrt(space_objects[0][3]**2+space_objects[1][3]**2+space_objects[2][3]**2)
+        mars_vel = np.sqrt(space_objects[3][3]**2+space_objects[4][3]**2+space_objects[5][3]**2)
+        DX.append(mag(v_pos) - mars_pos)
+        DV.append(mag(v_vel) - mars_vel)
 
         
 ## Output video simulation
-video_manager(image_folder, output_video_file, 60)
+#video_manager(image_folder, output_video_file, 60)
+
+
+## Show displacement data
+#DX = np.array(DX)
+#plt.plot(DX)
+#plt.show()
+
+#DV = np.array(DV)
+#plt.plot(DV)
+#plt.show()
