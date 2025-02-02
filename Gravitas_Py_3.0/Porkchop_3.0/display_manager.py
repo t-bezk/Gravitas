@@ -5,7 +5,7 @@ import numpy as np
     
 from math_func import mag
 
-def displayOrbit(a,e,i,omega,Omega,R):
+def displayOrbit(a,e,i,omega,Omega):
     
     # Generate true anomaly values from 0 to 2π
     nu = np.linspace(0, 2 * np.pi, 500)
@@ -44,6 +44,8 @@ def displayOrbit(a,e,i,omega,Omega,R):
 
     
     return np.array([x,y,z])
+
+
 
 if __name__ == "__main__":
     

@@ -47,13 +47,13 @@ def images_to_video(image_folder, output_video, frame_rate):
 """Parent function carries out entire video-processing system"""
 def video_manager(image_folder_p, output_video_p, frame_rate_p):
 
+
     ## Run file conversion funciton
     images_to_video(image_folder_p, output_video_p, frame_rate_p)
 
 
-
     ## Finally, delete all residual files from buffer folder
-    #delete_contents(image_folder_p)
+    delete_contents(image_folder_p)
 
 
 

@@ -50,8 +50,14 @@ space_objects = np.loadtxt(f"{dir}/space_objects.csv", delimiter=',',skiprows=1,
 
 
 
+## Define plotting parameters
+E = np.array([1,2])
+phi = np.linspace(0,2*np.pi,10)
+theta = np.linspace(0,np.pi,10)
+
+
 # Define vessel
-k_v_vel = np.array([0.000,0.003,0.010])
+k_v_vel = np.array([0.000,0.003,0.003])
 
 
 
@@ -88,9 +94,13 @@ DX = []
 DV = []
 
 
+loop_l = 300000     ## Keep log value less than 5 to prevent video manager from producing flickering footage
+
+frame_capture = 1000
+
 
 ## Time Loop
-for q in range(1,1002):
+for q in range(loop_l,2*loop_l):
 
 
     ## Time step orbits of planets by dt
@@ -106,7 +116,7 @@ for q in range(1,1002):
 
 
     ## Frame Capture for every other frame
-    if q % 1000 == 0:
+    if q % frame_capture == 0:
         
         #print(v_pos)
 
@@ -118,7 +128,7 @@ for q in range(1,1002):
        ## Plot positions of all N planets
         for p in N:
             aw = plotOrbs(p, space_objects)
-            ax.plot(aw[0],aw[1],aw[2],label="orbit")
+            ax.plot(aw[0],-aw[1],-aw[2],label="orbit")
             ax.scatter(au*space_objects[0][p],au*space_objects[1][p],au*space_objects[2][p])
 
 
@@ -132,7 +142,7 @@ for q in range(1,1002):
         ## Save Image to buffer file
         plt.savefig(f'{dir}/fig/im{int(q/1000)}.png',dpi=300)
 
-        plt.show()
+        #plt.show()
 
         plt.close()
 
@@ -145,7 +155,7 @@ for q in range(1,1002):
 
         
 ## Output video simulation
-#video_manager(image_folder, output_video_file, 60)
+video_manager(image_folder, output_video_file, 60)
 
 
 ## Show displacement data

@@ -22,7 +22,7 @@ def plotOrbs(i, sp_obj):
     w_e = np.arccos(np.dot(n_e,e_e)/(mag(n_e)*mag(e_e)))
     a_e = -mu/(2*E_e)
 
-    return displayOrbit(a_e,e_e,i_e,w_e,W_e,R_e)
+    return displayOrbit(a_e,e_e,i_e,w_e,W_e)
 
 
 
@@ -41,5 +41,5 @@ def plotTraj(V,R):
     w_e = np.arccos(np.dot(n_e,e_e)/(mag(n_e)*mag(e_e)))
     a_e = -mu/(2*E_e)
 
-    return displayOrbit(a_e,e_e,i_e,w_e,W_e,R)
+    return displayOrbit(a_e,e_e,i_e,w_e,W_e)
 
