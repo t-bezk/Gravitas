@@ -51,7 +51,7 @@ space_objects = np.loadtxt(f"{dir}/space_objects.csv", delimiter=',',skiprows=1,
 angle_res = 20
 
 ## Define plotting parameters
-E = np.linspace(0.0025,0.01,40)     ##Define as a velocity for now
+E = np.linspace(0.001,0.01,40)     ##Define as a velocity for now
 phi = np.linspace(0,2*np.pi,angle_res)
 theta = np.linspace(0,np.pi,angle_res)
 
@@ -103,7 +103,7 @@ for E_i in range(len(E)):
             
             dx_vec = np.abs(m_mod_val - s_mod_val)
 
-            DX[q1][q2] = np.max(dx_vec)
+            DX[q1][q2] = np.min(dx_vec)
 
             #print(mod_val)
             #print("-----")
@@ -115,7 +115,22 @@ for E_i in range(len(E)):
 
     #plt.show()
 
+dEmin_dE = (min_E[1:]-min_E[:-1]) / (E[1:]-E[:-1])
+
+d2Emin_dE2 = (dEmin_dE[1:]-dEmin_dE[:-1]) / (E[2:]-E[:-2])
+
+dEmin = np.max(d2Emin_dE2)
+
+Emax = 0
+
+for i in range(len(d2Emin_dE2)):
+    if d2Emin_dE2[i] == dEmin:
+        Emax = E[i]
+        break
+
 plt.plot(E,min_E)
+
+print(Emax)
 
 plt.show()
 
