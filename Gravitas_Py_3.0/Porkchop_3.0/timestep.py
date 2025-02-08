@@ -91,6 +91,19 @@ loop_l = 300000     ## Keep log value less than 5 to prevent video manager from 
 frame_capture = 1000
 
 
+##  
+z = np.linspace(-1,4*np.pi**2 - 0.01, 100)
+
+R1 = au*np.array([space_objects[0][2],space_objects[1][2],space_objects[2][2]])
+R2 = au*np.array([space_objects[0][3],space_objects[1][3],space_objects[2][3]])
+
+
+
+
+
+
+p = input()
+
 ## Time Loop
 for q in range(loop_l,2*loop_l):
 

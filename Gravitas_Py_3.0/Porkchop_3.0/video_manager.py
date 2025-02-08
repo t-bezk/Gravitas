@@ -22,7 +22,7 @@ def delete_contents(folder_path):
 """Create video file from series of images within buffer folder"""
 def images_to_video(image_folder, output_video, frame_rate):
 
-    images = sorted([img for img in os.listdir(image_folder) if img.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff'))])
+    images = ([img for img in os.listdir(image_folder) if img.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff'))])
     
     if not images:
         print("No images found in the folder.")
