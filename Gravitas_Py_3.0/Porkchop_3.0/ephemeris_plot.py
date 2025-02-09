@@ -30,6 +30,8 @@ from poliastro.iod import izzo
 
 from poliastro.bodies import Sun
 
+from poliastro.bodies import Earth
+
 from astropy import units as u
 
 
@@ -73,13 +75,13 @@ spice.furnsh(f"{dir}/naif0012.tls")  # leap seconds
 
 
 # Define departure times
-departure_time0 = "2019-01-01T00:00:00"
-departure_time1 = "2020-12-01T00:00:00"
+departure_time0 = "2020-05-01T00:00:00"
+departure_time1 = "2020-11-01T00:00:00"
 
 
 # Define arrival times
-arrival_time0 = "2021-01-01T00:00:00"
-arrival_time1 = "2022-04-01T00:00:00"
+arrival_time0 = "2020-12-01T00:00:00"
+arrival_time1 = "2022-01-01T00:00:00"
 
 # Convert to Ephemeris Time
 et_de0 = spice.str2et(departure_time0)
@@ -89,12 +91,12 @@ et_ar0 = spice.str2et(arrival_time0)
 et_ar1 = spice.str2et(arrival_time1)
 
 # Time step (1 hour increments)
-step = 3600*24  # seconds
+step = 3600*24*4  # seconds
 ets_de = np.arange(et_de0, et_de1, step)
 ets_ar = np.arange(et_ar0, et_ar1, step)
 
 # Define target and observer
-target = "MARS"
+target = "MARS BARYCENTER"
 origin = "EARTH"
 observer = "SUN"
 frame = "ECLIPJ2000"
@@ -104,7 +106,6 @@ abcorr = "NONE"
 trajectory_departure = np.array([spice.spkezr(origin, et, frame, abcorr, observer)[0] for et in ets_de])
 trajectory_arrival = np.array([spice.spkezr(target, et, frame, abcorr, observer)[0] for et in ets_ar])
 
-print(ets_ar[0] - ets_de[0])
 
 
 porkchop_array = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
@@ -116,26 +117,45 @@ for i in range(len(trajectory_arrival)):
 
     for j in range(len(trajectory_departure)):
         
-        lambert = izzo.lambert(Sun.k, trajectory_departure[j][:3]*u.m, trajectory_arrival[i][:3]*u.m, (ets_ar[i]*u.s - ets_de[j]*u.s),M=0)   # :3
+
+        lambert = izzo.lambert(Sun.k, trajectory_departure[j][:3]*u.m, trajectory_arrival[i][:3]*u.m, (ets_ar[i]*u.s - ets_de[j]*u.s),M=1)   # :3
 
         v0, v = next(lambert)
 
-        vp = trajectory_departure[j][3:]*1000
+        vp = trajectory_departure[j][3:]/1000
 
-        v_0 = v0.value
+        v_0 = v0/1000
 
-        c3 = mag(v_0-vp)**2
+        v_esc = np.sqrt(2 * Earth.k.value / 6371E3)/1000
+
+        vp_norm = vp / mag(vp)
+
+        c3 = np.abs(mag(v_0.value-vp))**2
+
+        ##v_0: km/s
+        ##v_esc: km/s
+        ##vp: km/s
+
+
+        #print('earth_mu: ', Earth.k)
+        #print('v_0: ', v_0)
+        #print('v_esc: ', v_esc)
+        #print('vp: ', vp)
 
         #print(v0)
         #print(trajectory_departure[j][3:])
-
+        #if c3 < 900000000:
         porkchop_array[i][j] = c3
 
-plt.imshow(porkchop_array)
-plt.colorbar()
-plt.show()
 
-#print(len(trajectory_arrival))
+CS = plt.contour(np.arange(len(trajectory_departure)),np.arange(len(trajectory_arrival)), porkchop_array, label='c3')
+plt.clabel(CS, inline=1, fontsize=10)
+plt.title('Mars 2020 Transfer')
+plt.xlabel('Departure Window')
+plt.ylabel('Arrival Window')
+plt.savefig(f'{dir}/video_output/pork.png')
+plt.legend()
+plt.show()
 
 
 ##  Delete buffer file contents
