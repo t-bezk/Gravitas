@@ -73,13 +73,13 @@ spice.furnsh(f"{dir}/naif0012.tls")  # leap seconds
 
 
 # Define departure times
-departure_time0 = "2020-01-01T00:00:00"
+departure_time0 = "2019-01-01T00:00:00"
 departure_time1 = "2020-12-01T00:00:00"
 
 
 # Define arrival times
 arrival_time0 = "2021-01-01T00:00:00"
-arrival_time1 = "2021-12-01T00:00:00"
+arrival_time1 = "2022-04-01T00:00:00"
 
 # Convert to Ephemeris Time
 et_de0 = spice.str2et(departure_time0)
@@ -116,19 +116,21 @@ for i in range(len(trajectory_arrival)):
 
     for j in range(len(trajectory_departure)):
         
-        lambert = izzo.lambert(Sun.k, trajectory_departure[j][:3]*u.m, trajectory_arrival[i][:3]*u.m, (ets_ar[0]*u.s - ets_de[0]*u.s)/100)   # :3
+        lambert = izzo.lambert(Sun.k, trajectory_departure[j][:3]*u.m, trajectory_arrival[i][:3]*u.m, (ets_ar[i]*u.s - ets_de[j]*u.s),M=0)   # :3
 
         v0, v = next(lambert)
 
-        vp = trajectory_departure[j][:3]
+        vp = trajectory_departure[j][3:]*1000
 
         v_0 = v0.value
 
+        c3 = mag(v_0-vp)**2
 
-        c3 = mag(v_0 - vp)**2
+        #print(v0)
+        #print(trajectory_departure[j][3:])
 
         porkchop_array[i][j] = c3
-#print("c3: ", c3)
+
 plt.imshow(porkchop_array)
 plt.colorbar()
 plt.show()
