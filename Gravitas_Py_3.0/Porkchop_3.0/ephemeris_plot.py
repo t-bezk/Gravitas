@@ -98,7 +98,7 @@ ets_ar = np.arange(et_ar0, et_ar1, step)
 # Define target and observer
 target = "MARS BARYCENTER"
 origin = "EARTH"
-observer = "SUN"
+observer = "SOLAR SYSTEM BARYCENTER"
 frame = "ECLIPJ2000"
 abcorr = "NONE"
 
@@ -109,6 +109,7 @@ trajectory_arrival = np.array([spice.spkezr(target, et, frame, abcorr, observer)
 
 
 porkchop_array = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
+vinfinity_array = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
 
 
 for i in range(len(trajectory_arrival)):
@@ -118,19 +119,22 @@ for i in range(len(trajectory_arrival)):
     for j in range(len(trajectory_departure)):
         
 
-        lambert = izzo.lambert(Sun.k, trajectory_departure[j][:3]*u.m, trajectory_arrival[i][:3]*u.m, (ets_ar[i]*u.s - ets_de[j]*u.s),M=1)   # :3
+        lambert = izzo.lambert(Sun.k, trajectory_departure[j][:3]*u.m, trajectory_arrival[i][:3]*u.m, (ets_ar[i]*u.s - ets_de[j]*u.s),M=0)   # :3
 
         v0, v = next(lambert)
 
         vp = trajectory_departure[j][3:]/1000
 
+        va = trajectory_arrival[i][3:]/1000
+
+
         v_0 = v0/1000
 
-        v_esc = np.sqrt(2 * Earth.k.value / 6371E3)/1000
-
         vp_norm = vp / mag(vp)
-
+        
         c3 = np.abs(mag(v_0.value-vp))**2
+
+        v_inf_ar = np.abs(mag(v.value/1000 - va))
 
         ##v_0: km/s
         ##v_esc: km/s
@@ -145,7 +149,10 @@ for i in range(len(trajectory_arrival)):
         #print(v0)
         #print(trajectory_departure[j][3:])
         #if c3 < 900000000:
+
+        #if c3 < 20:
         porkchop_array[i][j] = c3
+        vinfinity_array[i][j] = v_inf_ar
 
 
 CS = plt.contour(np.arange(len(trajectory_departure)),np.arange(len(trajectory_arrival)), porkchop_array, label='c3')
@@ -153,8 +160,19 @@ plt.clabel(CS, inline=1, fontsize=10)
 plt.title('Mars 2020 Transfer')
 plt.xlabel('Departure Window')
 plt.ylabel('Arrival Window')
-plt.savefig(f'{dir}/video_output/pork.png')
 plt.legend()
+plt.savefig(f'{dir}/video_output/pork.png')
+
+plt.show()
+
+CS1 = plt.contour(np.arange(len(trajectory_departure)),np.arange(len(trajectory_arrival)), vinfinity_array, label='c3')
+plt.clabel(CS1, inline=1, fontsize=10)
+plt.title('Mars 2020 Transfer')
+plt.xlabel('Departure Window')
+plt.ylabel('Arrival Window')
+plt.legend()
+plt.savefig(f'{dir}/video_output/vinf.png')
+
 plt.show()
 
 
@@ -165,7 +183,7 @@ delete_contents(image_folder)
 #ax = fig.add_subplot(111, projection='3d')
 #ax.scatter(0,0,0)
 
-
+spice.kclear()
 
 """
 for i in range(300):
@@ -186,7 +204,7 @@ plt.savefig(f'{dir}/fig/im.png',dpi=300)
 #video_manager(image_folder, output_video_file, 60)
 plt.show()
 # Unload kernels after use to prevent data leaks
-spice.kclear()
+
 """
 
 """
