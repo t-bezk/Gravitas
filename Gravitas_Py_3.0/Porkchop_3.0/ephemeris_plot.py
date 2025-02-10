@@ -18,6 +18,8 @@ from N_Body_Physics.Trajectory_Char import *
 
 from N_Body_Physics.Physics import *
 
+from display_manager import *
+
 import pathlib
 
 import spiceypy as spice
@@ -98,6 +100,7 @@ trajectory_arrival = np.array([spice.spkezr(target, et, frame, abcorr, observer)
 ##  Define array packets
 porkchop_array = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
 vinfinity_array = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
+vel_vec = np.zeros((len(trajectory_arrival),len(trajectory_departure), 3))
 time_of_flight = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
 
 
@@ -135,6 +138,7 @@ for i in range(len(trajectory_arrival)):
         porkchop_array[i][j] = c3
         vinfinity_array[i][j] = v_inf_ar
         time_of_flight[i][j] = (ets_ar[i] - ets_de[j])/(3600*24)
+        vel_vec[i][j] = v0.value
 
 
 ##--Plot porkchops with c3 and v-infinity data--##
@@ -170,3 +174,35 @@ v_inf_min = np.min(vinfinity_array)
 
 print('c3 min: ', c3_min)
 print('v-inf min: ', v_inf_min)
+
+min_i = 0
+min_j = 0
+
+for i in range(len(trajectory_arrival)):
+    for j in range(len(trajectory_departure)):
+        if porkchop_array[i][j] == c3_min:
+            min_i = i
+            min_j = j
+            break
+
+##  Plot trajectory
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+#ax.set_facecolor((0.0,0.0,0.0))
+#ax.grid(False)
+
+
+aw = plotTraj(1e3*trajectory_departure[min_j][3:], 1e3*trajectory_departure[min_j][:3])
+ax.plot(aw[0],-aw[1],-aw[2],label="orbit")
+ax.scatter(1e3*trajectory_departure[min_j][0],1e3*trajectory_departure[min_j][1],1e3*trajectory_departure[min_j][2])
+
+aw1 = plotTraj(1e3*trajectory_arrival[min_i][3:], 1e3*trajectory_arrival[min_i][:3])
+ax.plot(aw1[0],-aw1[1],-aw1[2],label="orbit")
+ax.scatter(1e3*trajectory_arrival[min_i][0],1e3*trajectory_arrival[min_i][1],1e3*trajectory_arrival[min_i][2])
+
+aw2 = plotTraj(1e3*vel_vec[min_i][min_j], 1e3*trajectory_departure[min_j][:3])
+ax.plot(aw2[0],-aw2[1],-aw2[2],label="orbit")
+
+plt.savefig(f'{dir}/video_output/min_traj.png',dpi=300)
+plt.show()
