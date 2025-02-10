@@ -90,7 +90,7 @@ et_ar0 = spice.str2et(arrival_time0)
 et_ar1 = spice.str2et(arrival_time1)
 
 # Time step (1 hour increments)
-step = 3600*12*4  # seconds
+step = 3600*12  # seconds
 ets_de = np.arange(et_de0, et_de1, step)
 ets_ar = np.arange(et_ar0, et_ar1, step)
 
@@ -110,6 +110,7 @@ trajectory_arrival = np.array([spice.spkezr(target, et, frame, abcorr, observer)
 porkchop_array = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
 vinfinity_array = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
 v_array = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
+time_of_flight = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
 
 
 for i in range(len(trajectory_arrival)):
@@ -136,23 +137,29 @@ for i in range(len(trajectory_arrival)):
         porkchop_array[i][j] = c3
         vinfinity_array[i][j] = v_inf_ar
         v_array[i][j] = np.linalg.norm(v0.value - vp)
+        time_of_flight[i][j] = (ets_ar[i] - ets_de[j])/(3600*24)
 
 
-fig, ax = plt.subplots(figsize=(12,8))
+fig, ax = plt.subplots(figsize=(10,12))
 
-CS = ax.contour(porkchop_array, np.arange(20,200,20), label='c3')
+CS = ax.contour(porkchop_array, levels=np.linspace(20,200,20), colors=[(1.0,0.0,0.0)])
 ax.clabel(CS, inline=1, fontsize=10)
+CS.set_label('c3')
 
-#CS1 = ax.contour(np.arange(len(trajectory_departure)),np.arange(len(trajectory_arrival)), vinfinity_array, label='v-inf')
-#ax.clabel(CS1, inline=1, fontsize=10)
+CS1 = ax.contour(vinfinity_array, levels=np.linspace(2,9,12), colors=[(0.0,0.0,1.0)])
+ax.clabel(CS1, inline=1, fontsize=10)
+CS1.set_label('v-inf')
 
-ax.set_title('Mars 2020 Transfer')
-ax.set_xlabel('Departure Window (Days after UST:2020-12-01T00:00:00)')
-ax.set_ylabel('Arrival Window (Days after UST:2022-01-01T00:00:00)')
+CS2 = ax.contour(time_of_flight, colors=[(0.0,1.0,0.0)])
+ax.clabel(CS2, inline=1, fontsize=10)
+CS2.set_label('time of flight')
 
-#ax.set_facecolor((0.0,0.0,0.0))
+plt.title('Mars 2020 Transfer')
+plt.xlabel('Departure Window (Days after UST:2020-12-01T00:00:00)')
+plt.ylabel('Arrival Window (Days after UST:2022-01-01T00:00:00)')
 
-fig.savefig(f'{dir}/video_output/pork_out.png')
+
+plt.savefig(f'{dir}/video_output/pork_out.png')
 
 plt.close()
 
