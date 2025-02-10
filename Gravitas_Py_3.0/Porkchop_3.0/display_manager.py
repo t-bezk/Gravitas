@@ -2,8 +2,6 @@
 
 
 import numpy as np
-    
-from math_func import mag
 
 def displayOrbit(a,e,i,omega,Omega):
     
@@ -11,7 +9,7 @@ def displayOrbit(a,e,i,omega,Omega):
     nu = np.linspace(0, 2 * np.pi, 500)
 
     # Calculate the radius for each true anomaly (orbit equation)
-    r = (a * (1 - mag(e)**2)) / (1 + mag(e) * np.cos(nu))
+    r = (a * (1 - np.norm(e)**2)) / (1 + np.norm(e) * np.cos(nu))
 
     # Position in the orbital plane (x', y')
     x_prime = r * np.cos(nu)

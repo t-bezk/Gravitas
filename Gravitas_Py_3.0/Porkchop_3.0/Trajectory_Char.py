@@ -1,6 +1,5 @@
 #Trajectory_Char.py
 
-
 from display_manager import *
 
 from math_func import *
