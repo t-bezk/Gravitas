@@ -14,9 +14,9 @@ from matplotlib import pyplot as plt
 
 from video_manager import *
 
-from Trajectory_Char import *
+from N_Body_Physics.Trajectory_Char import *
 
-from Physics import *
+from N_Body_Physics.Physics import *
 
 import pathlib
 
@@ -57,7 +57,7 @@ spice.furnsh(f"{dir}/Spice_Kernels/naif0012.tls")  # leap seconds
 
 
 #   Time step
-step = 3600*12  # seconds
+step = 3600*12*5  # seconds
 
 
 #   Define departure times

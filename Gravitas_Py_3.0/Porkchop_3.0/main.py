@@ -16,9 +16,9 @@ from matplotlib import pyplot as plt
 
 from video_manager import *
 
-from Trajectory_Char import *
+from N_Body_Physics.Trajectory_Char import *
 
-from Physics import *
+from N_Body_Physics.Physics import *
 
 import pathlib
 

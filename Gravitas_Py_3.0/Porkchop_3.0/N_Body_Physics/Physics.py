@@ -8,7 +8,7 @@ def updatePlanetaryPhysics(i, sp_obj):
     pos_0 = au*np.array([sp_obj[0][i],sp_obj[1][i],sp_obj[2][i]])
     vel_0 = auday*np.array([sp_obj[3][i],sp_obj[4][i],sp_obj[5][i]])
     
-    acc = -mu * np.power(mag(pos_0),-2) * (pos_0 / mag(pos_0))
+    acc = -mu * np.power(np.norm(pos_0),-2) * (pos_0 / np.norm(pos_0))
     
     sp_obj[3][i] += acc[0] * dt / auday
     sp_obj[4][i] += acc[1] * dt / auday
@@ -23,7 +23,7 @@ def updateVesselPhysics(x_vec, v_vec):
     pos_0 = au*x_vec
     vel_0 = auday*v_vec
     
-    acc = -mu * np.power(mag(pos_0),-2) * (pos_0 / mag(pos_0))
+    acc = -mu * np.power(np.norm(pos_0),-2) * (pos_0 / np.norm(pos_0))
 
     vel_0[0] += acc[0] * dt
     vel_0[1] += acc[1] * dt

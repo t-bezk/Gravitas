@@ -16,3 +16,5 @@ The original code was written in C++ and aimed to simulate n-body systems in 2 d
 ##Version 3.0##
 
 Gravitas Py 3.0 is the latest version and is written in Python to accelerate development in hopes of moving to a compiled language at a later time. A prokchop plot generator is currently in development with a time-step patched conic approximation simulator. 
+
+Use ephemeris_plot.py to get porkchop plots

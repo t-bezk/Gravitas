@@ -16,9 +16,9 @@ from matplotlib import pyplot as plt
 
 from video_manager import *
 
-from Trajectory_Char import *
+from N_Body_Physics.Trajectory_Char import *
 
-from Physics import *
+from N_Body_Physics.Physics import *
 
 import pathlib
 
@@ -155,8 +155,8 @@ for q in range(loop_l,2*loop_l):
         ## Record displacement data
         mars_pos = np.sqrt(space_objects[0][3]**2+space_objects[1][3]**2+space_objects[2][3]**2)
         mars_vel = np.sqrt(space_objects[3][3]**2+space_objects[4][3]**2+space_objects[5][3]**2)
-        DX.append(mag(v_pos) - mars_pos)
-        DV.append(mag(v_vel) - mars_vel)
+        DX.append(np.norm(v_pos) - mars_pos)
+        DV.append(np.norm(v_vel) - mars_vel)
 
         
 ## Output video simulation
