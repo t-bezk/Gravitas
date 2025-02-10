@@ -34,8 +34,7 @@ from poliastro.bodies import Earth
 
 from astropy import units as u
 
-
-
+import lambert_tools as lt
 
 ##  Retrieve local file directory
 dir = pathlib.Path(__file__).parent.resolve()
@@ -91,13 +90,13 @@ et_ar0 = spice.str2et(arrival_time0)
 et_ar1 = spice.str2et(arrival_time1)
 
 # Time step (1 hour increments)
-step = 3600*24*4  # seconds
+step = 3600*12*4  # seconds
 ets_de = np.arange(et_de0, et_de1, step)
 ets_ar = np.arange(et_ar0, et_ar1, step)
 
 # Define target and observer
 target = "MARS BARYCENTER"
-origin = "EARTH"
+origin = "EARTH BARYCENTER"
 observer = "SOLAR SYSTEM BARYCENTER"
 frame = "ECLIPJ2000"
 abcorr = "NONE"
@@ -110,6 +109,7 @@ trajectory_arrival = np.array([spice.spkezr(target, et, frame, abcorr, observer)
 
 porkchop_array = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
 vinfinity_array = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
+v_array = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
 
 
 for i in range(len(trajectory_arrival)):
@@ -118,72 +118,59 @@ for i in range(len(trajectory_arrival)):
 
     for j in range(len(trajectory_departure)):
         
-
-        lambert = izzo.lambert(Sun.k, trajectory_departure[j][:3]*u.m, trajectory_arrival[i][:3]*u.m, (ets_ar[i]*u.s - ets_de[j]*u.s),M=0)   # :3
+        v0 = 0
+        v = 0
+        #lambert = lt.lamberts_universal_variables(1e-3*trajectory_departure[j][:3],1e-3*trajectory_arrival[i][:3],(ets_ar[i]*u.s - ets_de[j]*u.s), tm=1, mu = Sun.k.value)
+        lambert = izzo.lambert(Sun.k, trajectory_departure[j][:3]*u.km, trajectory_arrival[i][:3]*u.km, (ets_ar[i]*u.s - ets_de[j]*u.s),M=0)   # :3
 
         v0, v = next(lambert)
 
-        vp = trajectory_departure[j][3:]/1000
+        vp = trajectory_departure[j][3:]
 
-        va = trajectory_arrival[i][3:]/1000
-
-
-        v_0 = v0/1000
-
-        vp_norm = vp / mag(vp)
+        va = trajectory_arrival[i][3:]
         
-        c3 = np.abs(mag(v_0.value-vp))**2
+        c3 = np.linalg.norm(v0.value - vp)**2
 
-        v_inf_ar = np.abs(mag(v.value/1000 - va))
+        v_inf_ar = np.linalg.norm(v.value - va)
 
-        ##v_0: km/s
-        ##v_esc: km/s
-        ##vp: km/s
-
-
-        #print('earth_mu: ', Earth.k)
-        #print('v_0: ', v_0)
-        #print('v_esc: ', v_esc)
-        #print('vp: ', vp)
-
-        #print(v0)
-        #print(trajectory_departure[j][3:])
-        #if c3 < 900000000:
-
-        #if c3 < 20:
         porkchop_array[i][j] = c3
         vinfinity_array[i][j] = v_inf_ar
+        v_array[i][j] = np.linalg.norm(v0.value - vp)
 
 
-CS = plt.contour(np.arange(len(trajectory_departure)),np.arange(len(trajectory_arrival)), porkchop_array, label='c3')
-plt.clabel(CS, inline=1, fontsize=10)
-plt.title('Mars 2020 Transfer')
-plt.xlabel('Departure Window')
-plt.ylabel('Arrival Window')
-plt.legend()
-plt.savefig(f'{dir}/video_output/pork.png')
+fig, ax = plt.subplots(figsize=(12,8))
 
-plt.show()
+CS = ax.contour(porkchop_array, np.arange(20,200,20), label='c3')
+ax.clabel(CS, inline=1, fontsize=10)
 
-CS1 = plt.contour(np.arange(len(trajectory_departure)),np.arange(len(trajectory_arrival)), vinfinity_array, label='c3')
-plt.clabel(CS1, inline=1, fontsize=10)
-plt.title('Mars 2020 Transfer')
-plt.xlabel('Departure Window')
-plt.ylabel('Arrival Window')
-plt.legend()
-plt.savefig(f'{dir}/video_output/vinf.png')
+#CS1 = ax.contour(np.arange(len(trajectory_departure)),np.arange(len(trajectory_arrival)), vinfinity_array, label='v-inf')
+#ax.clabel(CS1, inline=1, fontsize=10)
 
-plt.show()
+ax.set_title('Mars 2020 Transfer')
+ax.set_xlabel('Departure Window (Days after UST:2020-12-01T00:00:00)')
+ax.set_ylabel('Arrival Window (Days after UST:2022-01-01T00:00:00)')
 
+#ax.set_facecolor((0.0,0.0,0.0))
+
+fig.savefig(f'{dir}/video_output/pork_out.png')
+
+plt.close()
+
+#fig.show()
+
+plt.imshow(v_array)
+plt.colorbar()
+plt.savefig(f'{dir}/video_output/v_out.png')
+
+plt.close()
 
 ##  Delete buffer file contents
 delete_contents(image_folder)
 
-#fig = plt.figure()
-#ax = fig.add_subplot(111, projection='3d')
-#ax.scatter(0,0,0)
-
 spice.kclear()
+
+print('c3 min: ', np.min(porkchop_array))
+print('v-inf min: ', np.min(vinfinity_array))
 
 """
 for i in range(300):
