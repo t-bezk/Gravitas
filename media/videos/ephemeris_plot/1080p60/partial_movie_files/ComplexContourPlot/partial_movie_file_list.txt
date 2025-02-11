@@ -1,0 +1,5 @@
+# This file is used internally by FFMPEG.
+file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/ephemeris_plot/1080p60/partial_movie_files/ComplexContourPlot/3529212410_1931090614_223132457.mp4'
+file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/ephemeris_plot/1080p60/partial_movie_files/ComplexContourPlot/3040924799_4217992463_3504573880.mp4'
+file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/ephemeris_plot/1080p60/partial_movie_files/ComplexContourPlot/3040924799_586222810_1749382503.mp4'
+file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/ephemeris_plot/1080p60/partial_movie_files/ComplexContourPlot/3040924799_2844360058_662578642.mp4'

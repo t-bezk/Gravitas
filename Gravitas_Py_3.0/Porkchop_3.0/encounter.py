@@ -33,6 +33,11 @@ class P_CONFIG:
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)  # Assign all key-value pairs as attributes
 
+def print_and_erase(text):
+    print(text, end='', flush=True)
+    yield
+    print('\b' * len(text), end='', flush=True)
+
 def P_Solve(pd, sp_path):
 
     config = P_CONFIG(**pd)
@@ -87,22 +92,38 @@ def P_Solve(pd, sp_path):
 
     ##--Programming Loop--##
 
+    debug_message = ''
+
+    CURSOR_UP = "\033[1A"
+    CLEAR = "\x1b[2K"
+
+    print('Getting c3 array...')
+
     for i in range(len(trajectory_arrival)):
 
-
-        print(f'{i} of {len(trajectory_arrival)}')
+        debug_message = f'Generating Layers {i} of {len(trajectory_arrival)}'
+        print(debug_message)
 
         for j in range(len(trajectory_departure)):
             
+            if ets_ar[i] - ets_de[j] < 0:
+                c3_meshgrid[i][j] = 1e20
+                vinf_meshgrid[i][j] = 1e20
+                continue
+
+
+
             ##  Define velocity vectors
-            v0 = 0
-            v = 0
+            v0 = 0*u.km/u.s
+            v = 0*u.km/u.s
             vp = trajectory_departure[j][3:]
             va = trajectory_arrival[i][3:]
 
 
             ##  Izzo Lambert Solver
             lambert = izzo.lambert(Sun.k, trajectory_departure[j][:3]*u.km, trajectory_arrival[i][:3]*u.km, (ets_ar[i]*u.s - ets_de[j]*u.s),M=0)   # :3
+            
+            tof_meshgrid[i][j] = (ets_ar[i] - ets_de[j])/(3600*24)
 
 
             ##  Unpack initial and final velocity
@@ -117,7 +138,8 @@ def P_Solve(pd, sp_path):
             ##  Store values in array packets
             c3_meshgrid[i][j] = c3
             vinf_meshgrid[i][j] = v_inf_ar
-            tof_meshgrid[i][j] = (ets_ar[i] - ets_de[j])/(3600*24)
             #vel_vec[i][j] = v0.value
+        print(CURSOR_UP + CLEAR, end="")
+
     
     return np.array([c3_meshgrid, vinf_meshgrid, tof_meshgrid])
