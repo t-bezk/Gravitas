@@ -24,7 +24,7 @@ m_2020 = {
     "frame":        "ECLIPJ2000",
     "abcorr":       "NONE",
 
-    "step":         3600*12*20,
+    "step":         3600*12*30,
     "out_title":    "Venus to Mars Transfer Window",
 }
 
@@ -40,7 +40,7 @@ v_2020 = {
     "frame":        "ECLIPJ2000",
     "abcorr":       "NONE",
 
-    "step":         3600*12*20,
+    "step":         3600*12*30,
     "out_title":    "Mars 2020",
 }
 
@@ -51,16 +51,32 @@ dir = pathlib.Path(__file__).parent.resolve()
 
 ##--Plot porkchops with c3 and v-infinity data--##
 
-porkchop_array, vinfinity_array, time_of_flight = P_Solve(m_2020, dir)
-porkchop_array_2, vinfinity_array_2, time_of_flight_2 = P_Solve(v_2020, dir)
+v_leaving_1, v_arriving_1 = P_Solve_vec(m_2020, dir)
+v_leaving_2, v_arriving_2 = P_Solve_vec(v_2020, dir)
 
 ##  Define figure
 fig, ax = plt.subplots(figsize=(10,12))
 
+
+## Genetic Algorithms
+## Knapsack problem
+## FYP
+## J_2(r) Perturbations (Bessel Functions) inclination?
+## typetheory <-> Category theory
+
+
+
 #CS = ax.contour(porkchop_array, levels=np.linspace(20,200,20), colors=[(1.0,0.0,0.0)])
 #ax.clabel(CS, inline=1, fontsize=10)
 
-CS1 = ax.contour(vinfinity_array - vinfinity_array_2, levels=np.linspace(2,9,12), colors=[(0.0,0.0,1.0)])
+v_inf_comparison = np.zeros((len(v_leaving_2), len(v_arriving_1)))
+
+for i in range(len(v_leaving_2)):
+    for j in range(len(v_arriving_1)):
+        v_inf_comparison[i][j] = np.linalg.norm(v_leaving_2[i] - v_arriving_1[j])
+
+CS1 = ax.contour(v_inf_comparison, levels = np.linspace(0,1e3,20))
+
 ax.clabel(CS1, inline=1, fontsize=10)
 
 #DS1 = ax.contour(vinfinity_array_2, levels=np.linspace(2,9,12), colors=[(1.0,0.0,0.0)])
@@ -80,16 +96,6 @@ plt.close()
 
 ##  Offload spice kernel to prevent data leaks
 spice.kclear()
-
-
-##  Store Minimum Values
-c3_min = np.min(porkchop_array)
-c3_max = np.max(porkchop_array)
-v_inf_min = np.min(vinfinity_array)
-
-print('c3 min: ', c3_min)
-print('v-inf min: ', v_inf_min)
-print('c3 max: ', c3_max)
 
 min_i = 0
 min_j = 0
