@@ -33,10 +33,44 @@ class P_CONFIG:
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)  # Assign all key-value pairs as attributes
 
-def print_and_erase(text):
-    print(text, end='', flush=True)
-    yield
-    print('\b' * len(text), end='', flush=True)
+def P_Match(pd, sp_path):
+
+    config = P_CONFIG(**pd)
+
+    ##  Set the path to the image folder
+    image_folder = f"{sp_path}/fig/"
+
+    ##  Set the desired output video file name
+    output_video_file = f"{sp_path}/video_output/output_video.mp4"
+
+    ##  Output file name
+    output_plot_title = config.out_title
+
+
+    ##  Debug Package Loading
+    print(spice.tkvrsn('TOOLKIT'))
+
+
+
+    ##--Define departure and arrival parameters from spice kernels--##
+
+    #   Load SPICE kernels
+    spice.furnsh(f"{sp_path}/Spice_Kernels/de421.bsp")  # Ephemeris data
+    spice.furnsh(f"{sp_path}/Spice_Kernels/naif0012.tls")  # leap seconds
+
+
+    #   Convert to Ephemeris Time
+    et_de0 = spice.str2et(config.d_time0)
+    et_de1 = spice.str2et(config.d_time1)
+
+    et_ar0 = spice.str2et(config.a_time0)
+    et_ar1 = spice.str2et(config.a_time1)
+
+
+    ##  Ephemeris time arrays
+    ets_de = np.arange(et_de0, et_de1, config.step)
+    ets_ar = np.arange(et_ar0, et_ar1, config.step)
+
 
 def P_Solve(pd, sp_path):
 
@@ -81,14 +115,11 @@ def P_Solve(pd, sp_path):
     trajectory_departure = np.array([spice.spkezr(config.origin, et, config.frame, config.abcorr, config.observer)[0] for et in ets_de])
     trajectory_arrival = np.array([spice.spkezr(config.target, et, config.frame, config.abcorr, config.observer)[0] for et in ets_ar])
 
-
-    ##  Define array packets
-    c3_meshgrid = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
-    vinf_meshgrid = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
-    #vel_meshgrid = np.zeros((len(trajectory_arrival),len(trajectory_departure), 3))
-    tof_meshgrid = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
-
-
+    v0_m = np.zeros((len(trajectory_arrival),len(trajectory_departure), 3))
+    v1_m = np.zeros((len(trajectory_arrival),len(trajectory_departure), 3))
+    vp_m = np.zeros((len(trajectory_arrival),len(trajectory_departure), 3))
+    va_m = np.zeros((len(trajectory_arrival),len(trajectory_departure), 3))
+    tf_m = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
 
     ##--Programming Loop--##
 
@@ -107,10 +138,8 @@ def P_Solve(pd, sp_path):
         for j in range(len(trajectory_departure)):
             
             if ets_ar[i] - ets_de[j] < 0:
-                c3_meshgrid[i][j] = 1e20
-                vinf_meshgrid[i][j] = 1e20
+                tf_m[i][j] = 1e20
                 continue
-
 
 
             ##  Define velocity vectors
@@ -121,128 +150,20 @@ def P_Solve(pd, sp_path):
 
 
             ##  Izzo Lambert Solver
-            lambert = izzo.lambert(Sun.k, trajectory_departure[j][:3]*u.km, trajectory_arrival[i][:3]*u.km, (ets_ar[i]*u.s - ets_de[j]*u.s),M=0)   # :3
-            
-            tof_meshgrid[i][j] = (ets_ar[i] - ets_de[j])/(3600*24)
+            try:
+                lambert = izzo.lambert(Sun.k, trajectory_departure[j][:3]*u.km, trajectory_arrival[i][:3]*u.km, (ets_ar[i]*u.s - ets_de[j]*u.s),M=0)   # :3
+                v0, v = next(lambert)
 
+                tf_m[i][j] = (ets_ar[i] - ets_de[j])/(3600*24)
+            except:
+                pass
 
-            ##  Unpack initial and final velocity
-            v0, v = next(lambert)
+            v0_m[i][j] = v0
+            v1_m[i][j] = v
+            vp_m[i][j] = vp
+            va_m[i][j] = va
 
-
-            ##  Solve characteristic velocity and v-infinity
-            c3 = np.linalg.norm(v0.value - vp)**2
-            v_inf_ar = np.linalg.norm(v.value - va)
-
-
-            ##  Store values in array packets
-            c3_meshgrid[i][j] = c3
-            vinf_meshgrid[i][j] = v_inf_ar
-            #vel_vec[i][j] = v0.value
         print(CURSOR_UP + CLEAR, end="")
 
     
-    return np.array([c3_meshgrid, vinf_meshgrid, tof_meshgrid])
-
-def P_Solve_vec(pd, sp_path):
-
-    config = P_CONFIG(**pd)
-
-    ##  Set the path to the image folder
-    image_folder = f"{sp_path}/fig/"
-
-    ##  Set the desired output video file name
-    output_video_file = f"{sp_path}/video_output/output_video.mp4"
-
-    ##  Output file name
-    output_plot_title = config.out_title
-
-
-    ##  Debug Package Loading
-    print(spice.tkvrsn('TOOLKIT'))
-
-
-
-    ##--Define departure and arrival parameters from spice kernels--##
-
-    #   Load SPICE kernels
-    spice.furnsh(f"{sp_path}/Spice_Kernels/de421.bsp")  # Ephemeris data
-    spice.furnsh(f"{sp_path}/Spice_Kernels/naif0012.tls")  # leap seconds
-
-
-    #   Convert to Ephemeris Time
-    et_de0 = spice.str2et(config.d_time0)
-    et_de1 = spice.str2et(config.d_time1)
-
-    et_ar0 = spice.str2et(config.a_time0)
-    et_ar1 = spice.str2et(config.a_time1)
-
-
-    ##  Ephemeris time arrays
-    ets_de = np.arange(et_de0, et_de1, config.step)
-    ets_ar = np.arange(et_ar0, et_ar1, config.step)
-
-
-    #   Collect trajectory data
-    trajectory_departure = np.array([spice.spkezr(config.origin, et, config.frame, config.abcorr, config.observer)[0] for et in ets_de])
-    trajectory_arrival = np.array([spice.spkezr(config.target, et, config.frame, config.abcorr, config.observer)[0] for et in ets_ar])
-
-
-    ##  Define array packets
-    vinf_dep = np.zeros((len(trajectory_arrival),len(trajectory_departure), 3))
-    #vel_meshgrid = np.zeros((len(trajectory_arrival),len(trajectory_departure), 3))
-    vinf_arr = np.zeros((len(trajectory_arrival),len(trajectory_departure), 3))
-
-
-
-    ##--Programming Loop--##
-
-    debug_message = ''
-
-    CURSOR_UP = "\033[1A"
-    CLEAR = "\x1b[2K"
-
-    print('Getting c3 array...')
-
-    for i in range(len(trajectory_arrival)):
-
-        debug_message = f'Generating Layers {i} of {len(trajectory_arrival)}'
-        print(debug_message)
-
-        for j in range(len(trajectory_departure)):
-            
-            if ets_ar[i] - ets_de[j] < 0:
-                vinf_dep[i][j] = [1e20, 1e20, 1e20]
-                vinf_arr[i][j] = [1e20, 1e20, 1e20]
-                continue
-
-
-
-            ##  Define velocity vectors
-            v0 = 0*u.km/u.s
-            v = 0*u.km/u.s
-            vp = trajectory_departure[j][3:]
-            va = trajectory_arrival[i][3:]
-
-
-            ##  Izzo Lambert Solver
-            lambert = izzo.lambert(Sun.k, trajectory_departure[j][:3]*u.km, trajectory_arrival[i][:3]*u.km, (ets_ar[i]*u.s - ets_de[j]*u.s),M=0)   # :3
-
-
-            ##  Unpack initial and final velocity
-            v0, v = next(lambert)
-
-
-            ##  Solve characteristic velocity and v-infinity
-            v_dep = v0.value - vp
-            v_arr = v.value - va
-
-
-            ##  Store values in array packets
-            vinf_dep[i][j] = v_dep
-            vinf_arr[i][j] = v_arr
-            #vel_vec[i][j] = v0.value
-        print(CURSOR_UP + CLEAR, end="")
-
-    
-    return np.array([vinf_dep, vinf_arr])
+    return np.array([v0_m, v1_m, vp_m, va_m])

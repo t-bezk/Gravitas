@@ -11,28 +11,29 @@ from matplotlib import pyplot as plt
 
 from encounter import *
 
+
 # Instantiating with a dictionary-like structure
 m_2020 = {
-    "d_time0":      "2016-05-01T00:00:00",
-    "d_time1":      "2021-11-01T00:00:00",
-    "a_time0":      "2018-12-01T00:00:00",
-    "a_time1":      "2027-01-01T00:00:00",
+    "d_time0":      "2020-05-01T00:00:00",
+    "d_time1":      "2020-11-01T00:00:00",
+    "a_time0":      "2020-12-01T00:00:00",
+    "a_time1":      "2021-11-01T00:00:00",
 
-    "target":       "VENUS BARYCENTER",
+    "target":       "MARS BARYCENTER",
     "origin":       "EARTH BARYCENTER",
     "observer":     "SOLAR SYSTEM BARYCENTER",
     "frame":        "ECLIPJ2000",
     "abcorr":       "NONE",
 
-    "step":         3600*12*30,
-    "out_title":    "Venus to Mars Transfer Window",
+    "step":         3600*12*10,
+    "out_title":    "Mars Transfer Window",
 }
 
 v_2020 = {
-    "d_time0":      "2016-05-01T00:00:00",
-    "d_time1":      "2021-11-01T00:00:00",
-    "a_time0":      "2018-12-01T00:00:00",
-    "a_time1":      "2027-01-01T00:00:00",
+    "d_time0":      "2020-12-01T00:00:00",
+    "d_time1":      "2022-01-01T00:00:00",
+    "a_time0":      "2021-03-01T00:00:00",
+    "a_time1":      "2022-11-01T00:00:00",
 
     "target":       "MARS BARYCENTER",
     "origin":       "VENUS BARYCENTER",
@@ -40,7 +41,7 @@ v_2020 = {
     "frame":        "ECLIPJ2000",
     "abcorr":       "NONE",
 
-    "step":         3600*12*30,
+    "step":         3600*12,
     "out_title":    "Mars 2020",
 }
 
@@ -51,8 +52,11 @@ dir = pathlib.Path(__file__).parent.resolve()
 
 ##--Plot porkchops with c3 and v-infinity data--##
 
-v_leaving_1, v_arriving_1 = P_Solve_vec(m_2020, dir)
-v_leaving_2, v_arriving_2 = P_Solve_vec(v_2020, dir)
+v0,v1,vp,va  = P_Solve(m_2020, dir)
+
+##  Define meshgrids for contour plot
+c3 = np.linalg.norm(v0 - vp, axis=2)**2
+vi = np.linalg.norm(v1 - va, axis=2)
 
 ##  Define figure
 fig, ax = plt.subplots(figsize=(10,12))
@@ -66,30 +70,18 @@ fig, ax = plt.subplots(figsize=(10,12))
 
 
 
-#CS = ax.contour(porkchop_array, levels=np.linspace(20,200,20), colors=[(1.0,0.0,0.0)])
-#ax.clabel(CS, inline=1, fontsize=10)
+CS = ax.contour(c3, levels=np.linspace(0,25,20), colors=[(1.0,0.0,0.0)])
+ax.clabel(CS, inline=1, fontsize=10)
 
-v_inf_comparison = np.zeros((len(v_leaving_2), len(v_arriving_1)))
-
-for i in range(len(v_leaving_2)):
-    for j in range(len(v_arriving_1)):
-        v_inf_comparison[i][j] = np.linalg.norm(v_leaving_2[i] - v_arriving_1[j])
-
-CS1 = ax.contour(v_inf_comparison, levels = np.linspace(0,1e3,20))
-
+CS1 = ax.contour(vi, levels=np.linspace(0,20,20), colors=[(0.0,0.0,1.0)])
 ax.clabel(CS1, inline=1, fontsize=10)
 
-#DS1 = ax.contour(vinfinity_array_2, levels=np.linspace(2,9,12), colors=[(1.0,0.0,0.0)])
-#ax.clabel(DS1, inline=1, fontsize=10)
 
-#CS2 = ax.contour(time_of_flight, colors=[(0.0,1.0,0.0)])
-#ax.clabel(CS2, inline=1, fontsize=10)
+plt.title(m_2020["out_title"])
+plt.xlabel(f'Departure Window (Days after UST:{m_2020["d_time0"]})')
+plt.ylabel(f'Arrival Window (Days after UST:{m_2020["a_time1"]})')
 
-plt.title(v_2020["out_title"])
-plt.xlabel(f'Departure Window (Days after UST:{v_2020["d_time0"]})')
-plt.ylabel(f'Arrival Window (Days after UST:{v_2020["a_time1"]})')
-
-plt.savefig(f'{dir}/video_output/{v_2020["out_title"]}.png')
+plt.savefig(f'{dir}/video_output/{m_2020["out_title"]}.png')
 
 plt.close()
 
@@ -99,6 +91,7 @@ spice.kclear()
 
 min_i = 0
 min_j = 0
+
 
 
 """
