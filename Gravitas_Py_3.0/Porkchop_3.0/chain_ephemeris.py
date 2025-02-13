@@ -11,29 +11,31 @@ from matplotlib import pyplot as plt
 
 from encounter import *
 
+import scipy.interpolate as sc
+
 
 # Instantiating with a dictionary-like structure
 m_2020_1 = {
-    "d_time0":      "2020-01-01T00:00:00",
-    "d_time1":      "2022-11-01T00:00:00",
-    "a_time0":      "2020-07-01T00:00:00",
-    "a_time1":      "2024-11-01T00:00:00",
+    "d_time0":      "2020-12-01T00:00:00",
+    "d_time1":      "2022-02-01T00:00:00",
+    "a_time0":      "2021-04-01T00:00:00",
+    "a_time1":      "2022-12-01T00:00:00",
 
-    "target":       "MARS BARYCENTER",
+    "target":       "VENUS BARYCENTER",
     "origin":       "EARTH BARYCENTER",
     "observer":     "SOLAR SYSTEM BARYCENTER",
     "frame":        "ECLIPJ2000",
     "abcorr":       "NONE",
 
-    "step":         3600*24*5,
-    "out_title":    "Mars Transfer Window",
+    "step":         3600*12*5,
+    "out_title":    "Earth-Venus-Mars Transfer qq",
 }
 
 m_2020_2 = {
-    "d_time0":      "2020-01-01T00:00:00",
-    "d_time1":      "2022-11-01T00:00:00",
-    "a_time0":      "2020-07-01T00:00:00",
-    "a_time1":      "2024-11-01T00:00:00",
+    "d_time0":      "2021-04-01T00:00:00",
+    "d_time1":      "2022-12-01T00:00:00",
+    "a_time0":      "2021-01-01T00:00:00",
+    "a_time1":      "2023-01-01T00:00:00",
 
     "target":       "MARS BARYCENTER",
     "origin":       "VENUS BARYCENTER",
@@ -41,7 +43,7 @@ m_2020_2 = {
     "frame":        "ECLIPJ2000",
     "abcorr":       "NONE",
 
-    "step":         3600*24*5,
+    "step":         3600*12*5,
     "out_title":    "Mars 2020",
 }
 
@@ -56,14 +58,24 @@ v0,v1,vp,va  = P_Solve(m_2020_1, dir)
 
 vinf = v1 - va
 
+meshgrid_matrix = np.zeros((vinf.shape[0],vinf.shape[1]))
+
+
 for trial_index in range(vinf.shape[1]):
 
     tof_pm, dv_pm  = P_Match(m_2020_2, dir, trial_index, vinf[:,trial_index,:])
 
-    if any(y < 0 for y in dv_pm):
-        plt.plot(tof_pm, dv_pm)
+    meshgrid_matrix[:,trial_index] = dv_pm
 
-        plt.show()
+##  Define figure
+fig, ax = plt.subplots(figsize=(10,12))
+
+
+
+CS = ax.contour(meshgrid_matrix, levels=np.linspace(0,0.1,1), colors=[(0.0,0.0,1.0)])
+ax.clabel(CS, inline=1, fontsize=10)
+
+plt.show()
 
 ##  Define meshgrids for contour plot
 #c3 = np.linalg.norm(v0 - vp, axis=2)**2

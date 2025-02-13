@@ -219,7 +219,7 @@ def P_Match(pd, sp_path, j_ind, v_infinity):
 
             tf_m[i] = (ets_ar[i] - ets_de[j_ind])/(3600*24)
         except:
-            v0, v = 1e10, 1e10
+            v0, v = 1e10*u.km/u.s, 1e10*u.km/u.s
 
 
         dv_inf[i] = (v0.value - vp)

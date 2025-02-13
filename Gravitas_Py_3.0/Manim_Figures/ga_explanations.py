@@ -1,5 +1,59 @@
 from manim import *
 
+import numpy as np
+
+class RotatedHyperbolicMotion(Scene):
+    def construct(self):
+        # Define the axes (unchanged)
+        axes = Axes(
+            x_range=[-5, 5, 1],  
+            y_range=[-2, 6, 1],  
+            axis_config={"color": WHITE}
+        )
+
+        # Define the hyperbolic function: y = sqrt(x^2 + 1)
+        def hyperbolic_func(x):
+            return np.sqrt(x**2 + 1) - 1
+
+        # Generate the curve BEFORE rotating it
+        original_curve = axes.plot(hyperbolic_func, x_range=[-3, 3], color=BLUE)
+
+        # Rotate the curve by 45 degrees
+        rotated_curve = original_curve.copy().rotate(0 * DEGREES, about_point=axes.c2p(0, 0))
+
+        # Create the ball at the starting position (leftmost point)
+        ball = Dot(color=RED).move_to(rotated_curve.get_start())
+
+        planet = Circle(radius=0.2, color=RED)
+
+        # Create a "revealing" curve
+        revealed_curve = VMobject(color=BLUE)
+        revealed_curve.set_stroke(width=4)
+        revealed_curve.set_points_as_corners([ball.get_center()])  # Start with one point
+
+        # Function to update the revealed curve
+        def update_curve(curve):
+            new_point = ball.get_center()
+            if len(curve.get_points()) == 0 or np.linalg.norm(curve.get_points()[-1] - new_point) > 0.05:
+                curve.add_points_as_corners([new_point])
+
+        revealed_curve.add_updater(update_curve)
+
+        # Ball movement animation along the rotated curve
+        ball_movement = MoveAlongPath(ball, rotated_curve, run_time=5, rate_func=smooth)
+
+        # Animate
+        self.play(Create(axes))
+        self.play(Create(planet))
+        self.play(Create(ball))
+        self.add(revealed_curve)  # Add the revealing curve before animation
+        self.play(ball_movement)
+        self.wait(2)
+
+        # Remove updaters to keep final state
+        revealed_curve.clear_updaters()
+
+
 class AcceleratingBalls(Scene):
     def construct(self):
 
