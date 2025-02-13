@@ -62,13 +62,6 @@ vi = np.linalg.norm(v1 - va, axis=2)
 fig, ax = plt.subplots(figsize=(10,12))
 
 
-## Genetic Algorithms
-## Knapsack problem
-## FYP
-## J_2(r) Perturbations (Bessel Functions) inclination?
-## typetheory <-> Category theory
-
-
 
 CS = ax.contour(c3, levels=np.linspace(0,25,20), colors=[(1.0,0.0,0.0)])
 ax.clabel(CS, inline=1, fontsize=10)
@@ -94,33 +87,8 @@ min_j = 0
 
 
 
-"""
-for i in range(len(trajectory_arrival)):
-    for j in range(len(trajectory_departure)):
-        if porkchop_array[i][j] == c3_min:
-            min_i = i
-            min_j = j
-            break
-
-##  Plot trajectory
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-
-#ax.set_facecolor((0.0,0.0,0.0))
-#ax.grid(False)
-
-
-aw = plotTraj(1e3*trajectory_departure[min_j][3:], 1e3*trajectory_departure[min_j][:3])
-ax.plot(aw[0],-aw[1],-aw[2],label="orbit")
-ax.scatter(1e3*trajectory_departure[min_j][0],1e3*trajectory_departure[min_j][1],1e3*trajectory_departure[min_j][2])
-
-aw1 = plotTraj(1e3*trajectory_arrival[min_i][3:], 1e3*trajectory_arrival[min_i][:3])
-ax.plot(aw1[0],-aw1[1],-aw1[2],label="orbit")
-ax.scatter(1e3*trajectory_arrival[min_i][0],1e3*trajectory_arrival[min_i][1],1e3*trajectory_arrival[min_i][2])
-
-aw2 = plotTraj(1e3*vel_vec[min_i][min_j], 1e3*trajectory_departure[min_j][:3])
-ax.plot(aw2[0],-aw2[1],-aw2[2],label="orbit")
-
-plt.savefig(f'{dir}/video_output/min_traj.png',dpi=300)
-plt.show()
-"""
+## Genetic Algorithms
+## Knapsack problem
+## FYP
+## J_2(r) Perturbations (Bessel Functions) inclination?
+## typetheory <-> Category theory

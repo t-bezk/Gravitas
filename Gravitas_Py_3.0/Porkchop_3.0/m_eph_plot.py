@@ -12,14 +12,14 @@ from matplotlib import pyplot as plt
 from encounter import *
 
 # Instantiating with a dictionary-like structure
-m_2020 = {
+e_2020 = {
     "d_time0":      "2018-05-01T00:00:00",
     "d_time1":      "2020-11-01T00:00:00",
     "a_time0":      "2019-12-01T00:00:00",
     "a_time1":      "2024-05-01T00:00:00",
 
     "target":       "MARS BARYCENTER",
-    "origin":       "VENUS BARYCENTER",
+    "origin":       "EARTH BARYCENTER",
     "observer":     "SOLAR SYSTEM BARYCENTER",
     "frame":        "ECLIPJ2000",
     "abcorr":       "NONE",
@@ -28,14 +28,14 @@ m_2020 = {
     "out_title":    "Venus to Mars Transfer Window",
 }
 
-v_2020 = {
+m_2020 = {
     "d_time0":      "2020-04-01T00:00:00",
     "d_time1":      "2020-12-01T00:00:00",
     "a_time0":      "2020-11-01T00:00:00",
     "a_time1":      "2022-10-01T00:00:00",
 
-    "target":       "MARS BARYCENTER",
-    "origin":       "EARTH BARYCENTER",
+    "target":       "EARTH BARYCENTER",
+    "origin":       "MARS BARYCENTER",
     "observer":     "SOLAR SYSTEM BARYCENTER",
     "frame":        "ECLIPJ2000",
     "abcorr":       "NONE",
@@ -51,13 +51,74 @@ dir = pathlib.Path(__file__).parent.resolve()
 
 ##--Plot porkchops with c3 and v-infinity data--##
 
-porkchop_array, vinfinity_array, time_of_flight = P_Solve(v_2020, dir)
+#porkchop_array, vinfinity_array, time_of_flight = P_Solve(v_2020, dir)
 
+
+planet_ephemeris_dep_Earth, planet_ephemeris_arr_Earth = getPlanetaryEphemeris(e_2020, dir)
+planet_ephemeris_dep_Mars, planet_ephemeris_arr_Mars = getPlanetaryEphemeris(m_2020, dir)
+
+#v0,v1,vp,va  = P_Solve(m_2020, dir)
+
+indu=10
+indv=10
+
+
+
+R_Vec_Earth = planet_ephemeris_dep_Earth[indu][:3]
+V_Vec_Earth = planet_ephemeris_dep_Earth[indu][3:]
+
+R_Vec_Mars = planet_ephemeris_dep_Mars[indu][:3]
+V_Vec_Mars = planet_ephemeris_dep_Mars[indu][3:]
+
+print(R_Vec_Earth, ', ', V_Vec_Earth)
+
+
+Earth_Trajectory = plotTraj(1e3*V_Vec_Earth, 1e3*R_Vec_Earth)
+Mars_Trajectory = plotTraj(1e3*V_Vec_Mars, 1e3*R_Vec_Mars)
 
 from manim import *
 import numpy as np
-import matplotlib.pyplot as plt
 
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+
+ax.plot(Earth_Trajectory[0],Earth_Trajectory[1],Earth_Trajectory[2])
+ax.plot(Mars_Trajectory[0],Mars_Trajectory[1],Mars_Trajectory[2])
+
+plt.show()
+print(Earth_Trajectory)
+
+from manim import *
+import numpy as np
+
+class AutoRescaled3DPlot(ThreeDScene):
+    def construct(self):
+        axes = ThreeDAxes()
+
+        # ✅ Generate r_array
+        r_array = Earth_Trajectory
+
+        # ✅ Find max value for automatic scaling
+        max_val = np.max(np.abs(r_array))  # Largest absolute coordinate
+        scale_factor = 1 / max_val if max_val > 1 else 1  # Scale only if needed
+        axes.scale(scale_factor)  # ✅ Automatically rescale axes
+
+        # ✅ Convert r_array into Manim points
+        manim_points = [axes.c2p(*point) for point in r_array]
+
+        # ✅ Create 3D curve
+        curve = VGroup(*[Line3D(manim_points[i], manim_points[i + 1], color=BLUE)
+                         for i in range(len(manim_points) - 1)])
+
+        # ✅ Adjust camera for better visibility
+        self.set_camera_orientation(phi=75 * DEGREES, theta=45 * DEGREES, zoom=0.8)
+
+        # ✅ Add elements to scene
+        self.add(axes, curve)
+        self.wait(3)
+
+"""
 class ContourAndEllipses(ThreeDScene):
     def construct(self):
         # --- Left Side: Contour Plot ---
@@ -126,3 +187,4 @@ class ContourAndEllipses(ThreeDScene):
         self.play(Rotate(ellipses_group, angle=TAU, axis=OUT, run_time=5, rate_func=linear))
         self.wait(2)
 
+"""
