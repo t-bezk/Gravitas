@@ -51,7 +51,7 @@ m_2020_2 = {
 
 match_vm = {
     "d_time0":      "2021-04-01T00:00:00",
-    "a_time0":      "2021-01-01T00:00:00",
+    "d_time1":      "2022-12-01T00:00:00",
     "a_time0":      "2021-01-01T00:00:00",
     "a_time1":      "2023-01-01T00:00:00",
 
@@ -94,24 +94,25 @@ vi_min_c = vi_vec[min_ind_v]
 va_min_v = va[min_ind_v]
 
 
+
 print(np.linalg.norm(c3_min_v)**2, ' ', np.linalg.norm(vi_min_c))
 print(c3_min, ' ', vi_min)
 
-tppp, vppp = P_Match(match_vm, dir, vi_min_c, 3600*24*200)
+dddddddd = P_Match(match_vm, dir, vi_min_c, 3600*24*200)
 
-plt.plot(tppp, vppp)
+fig, ax = plt.subplots(figsize=(10,12))
+
+CS = ax.contour(dddddddd, levels=np.linspace(-30,30,20), colors=[(0.0,0.0,1.0)])
+ax.clabel(CS, inline=1, fontsize=10)
 
 plt.show()
+#tppp, vppp = P_Match(match_vm, dir, vi_min_c, 3600*24*200)
 
 
 #CS = ax.contour(meshgrid_matrix, levels=np.linspace(0,0.1,1), colors=[(0.0,0.0,1.0)])
 #ax.clabel(CS, inline=1, fontsize=10)
 
 #plt.show()
-
-##  Define meshgrids for contour plot
-#c3 = np.linalg.norm(v0 - vp, axis=2)**2
-#vi = np.linalg.norm(v1 - va, axis=2)
 
 
 ## Genetic Algorithms

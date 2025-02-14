@@ -163,7 +163,7 @@ def P_Solve(pd, sp_path):
 
 
 
-
+import matplotlib.pyplot as plt
 
 def P_Match(pd, sp_path, v_infinity, time_of_flight):
 
@@ -192,54 +192,60 @@ def P_Match(pd, sp_path, v_infinity, time_of_flight):
 
     second_time = add_time_to_datetime(config.d_time0, time_of_flight)
 
-    #   Convert to Ephemeris Time
-    et_de0 = spice.str2et(config.d_time0)
+    et_de1 = spice.str2et(config.d_time1)
 
     et_ar0 = spice.str2et(config.a_time0)
     et_ar1 = spice.str2et(second_time)
 
-
-    ##  Ephemeris time arrays
     ets_ar = np.arange(et_ar0, et_ar1, config.step)
 
+    dv_mag_2d = np.zeros((100, len(ets_ar)))
 
-    #   Collect trajectory data
-    trajectory_departure = spice.spkezr(config.origin, et_de0, config.frame, config.abcorr, config.observer)[0]
+    for dt in range(100):
+        #   Convert to Ephemeris Time
+        et_de0 = spice.str2et(add_time_to_datetime(config.d_time0, 3600*24*dt))
 
-    trajectory_arrival = np.array([spice.spkezr(config.target, et, config.frame, config.abcorr, config.observer)[0] for et in ets_ar])
+        #   Collect trajectory data
+        trajectory_departure = spice.spkezr(config.origin, et_de0, config.frame, config.abcorr, config.observer)[0]
 
-    tf_m = np.zeros((len(trajectory_arrival)))
-    dv_inf = np.zeros((len(trajectory_arrival), 3))
+        trajectory_arrival = np.array([spice.spkezr(config.target, et, config.frame, config.abcorr, config.observer)[0] for et in ets_ar])
 
-
-    ##--Programming Loop--##
-
-    print('Getting Matching array...')
-
-    for i in range(len(ets_ar)):
-
-        ##  Define velocity vectors
-        v0 = 0*u.km/u.s
-        v = 0*u.km/u.s
-        vp = trajectory_departure[3:]
-        va = trajectory_arrival[i][3:]
+        tf_m = np.zeros((len(trajectory_arrival)))
+        dv_inf = np.zeros((len(trajectory_arrival), 3))
 
 
-        ##  Izzo Lambert Solver
-        try:
-            lambert = izzo.lambert(Sun.k, trajectory_departure[:3]*u.km, trajectory_arrival[i][:3]*u.km, ets_ar[i]*u.s,M=0)   # :3
-            v0, v = next(lambert)
+        ##--Programming Loop--##
 
-            tf_m[i] = ets_ar[i]/(3600*24)
-        except:
-            v0, v = 1e10*u.km/u.s, 1e10*u.km/u.s
+        print('Getting Matching array...')
+
+        for i in range(len(ets_ar)):
+
+            ##  Define velocity vectors
+            v0 = 0*u.km/u.s
+            v = 0*u.km/u.s
+            vp = trajectory_departure[3:]
+            va = trajectory_arrival[i][3:]
 
 
-        dv_inf[i,:] = (v0.value - vp)
+            ##  Izzo Lambert Solver
+            try:
+                lambert = izzo.lambert(Sun.k, trajectory_departure[:3]*u.km, trajectory_arrival[i][:3]*u.km, ets_ar[i]*u.s,M=0)   # :3
+                v0, v = next(lambert)
 
-    v_i = np.linalg.norm(v_infinity - dv_inf, axis=1)
+                tf_m[i] = ets_ar[i]/(3600*24)
+            except:
+                v0, v = 1e10*u.km/u.s, 1e10*u.km/u.s
 
-    return np.array([ets_ar, v_i], dtype=object)
+
+            dv_inf[i,:] = (v0.value - vp)
+
+        dv_i = np.linalg.norm(v_infinity - dv_inf, axis=1)
+
+        #plt.plot(ets_ar, dv_i)
+        dv_mag_2d[dt] = dv_i
+        #plt.show()
+
+    return dv_mag_2d
 
 
 

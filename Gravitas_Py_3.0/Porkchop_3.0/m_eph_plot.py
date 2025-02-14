@@ -76,8 +76,6 @@ print(R_Vec_Earth, ', ', V_Vec_Earth)
 Earth_Trajectory = plotTraj(1e3*V_Vec_Earth, 1e3*R_Vec_Earth)
 Mars_Trajectory = plotTraj(1e3*V_Vec_Mars, 1e3*R_Vec_Mars)
 
-from manim import *
-import numpy as np
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
@@ -86,37 +84,68 @@ ax = fig.add_subplot(111, projection='3d')
 ax.plot(Earth_Trajectory[0],Earth_Trajectory[1],Earth_Trajectory[2])
 ax.plot(Mars_Trajectory[0],Mars_Trajectory[1],Mars_Trajectory[2])
 
-plt.show()
+#plt.show()
 print(Earth_Trajectory)
 
 from manim import *
 import numpy as np
 
-class AutoRescaled3DPlot(ThreeDScene):
+class OrbitScene(ThreeDScene):
+    def compute_orbital_elements(self, r, v, mu):
+        """ Compute semi-major axis, eccentricity, and argument of periapsis. """
+
+        h = np.cross(r, v)
+        h_norm = np.linalg.norm(h)
+
+        e_vec = (np.cross(v, h) / mu) - (r / np.linalg.norm(r))
+        e = np.linalg.norm(e_vec)
+
+        r_norm = np.linalg.norm(r)
+        v_norm = np.linalg.norm(v)
+        energy = (v_norm**2 / 2) - (mu / r_norm)
+        a = -mu / (2 * energy)  # Semi-major axis
+
+        periapsis_angle = np.arctan2(e_vec[1], e_vec[0])  # Argument of periapsis ω
+
+        return a, e, periapsis_angle
+
     def construct(self):
-        axes = ThreeDAxes()
+        """ Creates a 2D orbital ellipse in Manim """
+        
+        # Define position and velocity vectors (AU, AU/day)
+        r_vec = R_Vec_Earth 
+        v_vec = V_Vec_Earth
 
-        # ✅ Generate r_array
-        r_array = Earth_Trajectory
+        # Standard Gravitational Parameter for the Sun (AU^3/day^2)
+        mu_sun = 6.67e-11 * 2e30
 
-        # ✅ Find max value for automatic scaling
-        max_val = np.max(np.abs(r_array))  # Largest absolute coordinate
-        scale_factor = 1 / max_val if max_val > 1 else 1  # Scale only if needed
-        axes.scale(scale_factor)  # ✅ Automatically rescale axes
+        # Compute orbital elements
+        a, e, omega = self.compute_orbital_elements(1e3*r_vec, 1e3*v_vec, mu_sun)
 
-        # ✅ Convert r_array into Manim points
-        manim_points = [axes.c2p(*point) for point in r_array]
+        # Generate the orbit
+        theta = np.linspace(0, 2 * np.pi, 500)
+        r_orbit = (a * (1 - e**2)) / (1 + e * np.cos(theta))
 
-        # ✅ Create 3D curve
-        curve = VGroup(*[Line3D(manim_points[i], manim_points[i + 1], color=BLUE)
-                         for i in range(len(manim_points) - 1)])
+        # Convert to Cartesian
+        x_orbit = r_orbit * np.cos(theta) * 1e-5
+        y_orbit = r_orbit * np.sin(theta) * 1e-5
 
-        # ✅ Adjust camera for better visibility
-        self.set_camera_orientation(phi=75 * DEGREES, theta=45 * DEGREES, zoom=0.8)
+        # Rotate by argument of periapsis
+        x_rot = x_orbit * np.cos(omega) - y_orbit * np.sin(omega)
+        y_rot = x_orbit * np.sin(omega) + y_orbit * np.cos(omega)
 
-        # ✅ Add elements to scene
-        self.add(axes, curve)
+        # Create Manim objects
+        orbit_curve = VMobject().set_points_as_corners([*[np.array([x, y, 0]) for x, y in zip(x_rot, y_rot)]])
+        orbit_curve.set_color(BLUE)
+
+        sun = Dot(point=[0, 0, 0], color=YELLOW)  # Sun at focus
+        planet = Dot(point=[1e-8*r_vec[0], 1e-8*r_vec[1], 0], color=RED)  # Initial position
+
+        # Animate
+        self.set_camera_orientation(phi=0 * DEGREES, theta=0 * DEGREES)
+        self.play(Create(orbit_curve), FadeIn(sun), FadeIn(planet))
         self.wait(3)
+
 
 """
 class ContourAndEllipses(ThreeDScene):

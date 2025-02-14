@@ -1,0 +1,3 @@
+# This file is used internally by FFMPEG.
+file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/m_eph_plot/1080p60/partial_movie_files/AdjustableEllipses/1385205532_3545331046_1777384306.mp4'
+file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/m_eph_plot/1080p60/partial_movie_files/AdjustableEllipses/2587282329_4150876196_3807741333.mp4'
