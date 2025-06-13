@@ -1,8 +1,0 @@
-# This file is used internally by FFMPEG.
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/m_eph_plot/1080p60/partial_movie_files/ContourAndEllipses/2544536139_3382639976_223132457.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/m_eph_plot/1080p60/partial_movie_files/ContourAndEllipses/3395690346_295205141_1294850035.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/m_eph_plot/1080p60/partial_movie_files/ContourAndEllipses/3395690346_2631580503_2415044563.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/m_eph_plot/1080p60/partial_movie_files/ContourAndEllipses/3395690346_3334801645_1278861305.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/m_eph_plot/1080p60/partial_movie_files/ContourAndEllipses/3395690346_2631580503_681046596.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/m_eph_plot/1080p60/partial_movie_files/ContourAndEllipses/3395690346_3580338137_3344565911.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/m_eph_plot/1080p60/partial_movie_files/ContourAndEllipses/3395690346_789064381_1341673578.mp4'

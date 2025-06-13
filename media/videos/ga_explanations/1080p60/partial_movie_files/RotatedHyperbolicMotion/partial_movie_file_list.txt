@@ -1,6 +1,0 @@
-# This file is used internally by FFMPEG.
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/ga_explanations/1080p60/partial_movie_files/RotatedHyperbolicMotion/3529212410_1626322941_223132457.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/ga_explanations/1080p60/partial_movie_files/RotatedHyperbolicMotion/3040924799_268515405_450569431.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/ga_explanations/1080p60/partial_movie_files/RotatedHyperbolicMotion/3040924799_4277077251_2409767753.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/ga_explanations/1080p60/partial_movie_files/RotatedHyperbolicMotion/3040924799_1105144083_413982682.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/ga_explanations/1080p60/partial_movie_files/RotatedHyperbolicMotion/3040924799_2844360058_1649738998.mp4'

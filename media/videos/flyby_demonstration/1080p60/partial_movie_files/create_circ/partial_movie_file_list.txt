@@ -1,2 +1,0 @@
-# This file is used internally by FFMPEG.
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/flyby_demonstration/1080p60/partial_movie_files/create_circ/3977891868_3120274435_223132457.mp4'

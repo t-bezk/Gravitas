@@ -1,2 +1,0 @@
-# This file is used internally by FFMPEG.
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/m_eph_plot/1080p60/partial_movie_files/Parametric3DPlot/1385205532_3879069619_750830930.mp4'

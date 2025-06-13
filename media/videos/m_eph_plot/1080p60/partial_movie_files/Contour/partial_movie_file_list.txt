@@ -1,8 +1,0 @@
-# This file is used internally by FFMPEG.
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/m_eph_plot/1080p60/partial_movie_files/Contour/2544536139_2493986287_223132457.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/m_eph_plot/1080p60/partial_movie_files/Contour/3395690346_940699239_964568470.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/m_eph_plot/1080p60/partial_movie_files/Contour/3395690346_2631580503_302985682.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/m_eph_plot/1080p60/partial_movie_files/Contour/3395690346_616797262_2250646865.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/m_eph_plot/1080p60/partial_movie_files/Contour/3395690346_2631580503_1026307348.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/m_eph_plot/1080p60/partial_movie_files/Contour/3395690346_3580338137_3900022145.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/m_eph_plot/1080p60/partial_movie_files/Contour/3395690346_789064381_3500858144.mp4'

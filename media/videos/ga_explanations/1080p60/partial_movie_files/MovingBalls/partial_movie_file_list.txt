@@ -1,5 +1,0 @@
-# This file is used internally by FFMPEG.
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/ga_explanations/1080p60/partial_movie_files/MovingBalls/3529212410_978645687_223132457.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/ga_explanations/1080p60/partial_movie_files/MovingBalls/3040924799_4217992463_3223381611.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/ga_explanations/1080p60/partial_movie_files/MovingBalls/3040924799_3581518015_1468728778.mp4'
-file 'file:C:/Users/tbezk/Documents/git_repositories/gravitas/Gravitas/media/videos/ga_explanations/1080p60/partial_movie_files/MovingBalls/3040924799_2844360058_4269669866.mp4'
