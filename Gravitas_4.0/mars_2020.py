@@ -30,7 +30,6 @@ ax.clabel(vi_contour, inline=1, fontsize=10)
 ax.set_title(f'{m_2020["out_title"]}')
 ax.set_xlabel(f'Departure Window (Days after UST:{m_2020["d_time0"]})')
 ax.set_ylabel(f'Arrival Window (Days after UST:{m_2020["a_time1"]})')
-
 fig.savefig(f'{PROJ_DIR}/video_output/{m_2020["out_title"]}.png')
 
 plt.show()
