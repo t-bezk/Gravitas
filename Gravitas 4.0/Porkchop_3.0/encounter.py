@@ -1,303 +1,156 @@
-#ephemeris_plot.py
-
 """""""""""""""""""""""""""""""""
 ----------------------------------
-GRAVITAS V.3.0 - Porkchop Plotter
+GRAVITAS v.4.0.1 - encounter module
 by Tomas Bezkorowajnyj c. February 2025
 ----------------------------------
 """""""""""""""""""""""""""""""""
 
-
-import numpy as np
-
-from video_manager import *
-
-from N_Body_Physics.Trajectory_Char import *
-
-from N_Body_Physics.Physics import *
-
-from display_manager import *
-
 import pathlib
-
+import numpy as np
 import spiceypy as spice
-
 from poliastro.iod import izzo
-
-from poliastro.bodies import Sun, Earth
-
+from poliastro.bodies import Sun
 from astropy import units as u
 
-from datetime import datetime, timedelta
-
-##  Retrieve local file directory
-sp_path = pathlib.Path(__file__).parent.resolve()
-
-def add_time_to_datetime(time_str, delt):   ##  Add time in seconds
-
-    # Convert to datetime object
-    time_obj = datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%S")
-
-    # Add 60 days
-    new_time_obj = time_obj + timedelta(seconds = delt)
-
-    # Convert back to string in the same format
-    new_time_str = new_time_obj.strftime("%Y-%m-%dT%H:%M:%S")
-
-    return new_time_str
+PROJ_DIR = pathlib.Path(__file__).parent.resolve()
+SP_DIR = 'Spice_Kernels'    ## Directory from project folder to spice kernels
+CURSOR_UP = "\033[1A"
+CLR = "\x1b[2K"
 
 
-class P_CONFIG:
-    def __init__(self, **kwargs):
-        self.__dict__.update(kwargs)  # Assign all key-value pairs as attributes
-
-
-def porkchop_solve(dict_values):
+def setup_kernel():
     """
-    Parameters:
-    ---------------
-    dict_values {
+        Locate spice kernel data
 
-        d_time0 - departure window lower bound
-        d_time1 - departure window upper bound
-        a_time0 - arrival window lower bound
-        a_time1 - arrival window upper bound
+        Returns:
+            None
+    """
+    ## Debug Package Loading
+    try:
+        print(spice.tkvrsn('TOOLKIT'))
+    except NotImplementedError as e:
+        raise ValueError("Toolkit not found") from e
 
-        target - 
-        origin - 
-        observer - 
-        frame - 
-        abcorr - 
+    ## Load SPICE kernels from file
+    spice.furnsh(f"{PROJ_DIR}/{SP_DIR}/de421.bsp")
+    spice.furnsh(f"{PROJ_DIR}/{SP_DIR}/naif0012.tls")
 
-        step - time step (recommended 1 day)
-        out_title - 
+
+def get_ephemeris_time(lower_bond, upper_bound, time_step):
+    """
+        Convert to ephemeris time and return ordered array
+
+        Returns:
+            float: 
+    """
+    eph0, eph1 = spice.str2et(lower_bond), spice.str2et(upper_bound)
+    return np.arange(eph0, eph1, time_step)
+
+
+def get_trajectory_data(origin, ets, frame, abcorr, observer):
+    """Get position data array from time array"""
+    return [spice.spkezr(origin, et, frame, abcorr, observer)[0] for et in ets]
+
+
+def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_rotations=0):
+    """
+        Pararmeters:
+            ndarray: trajectory_departure
+            ndarray: trajectory_arrival
+            ndarray: ets_de
+            ndarray: ets_ar
+            int: no_rotations = 0
+
+        Returns:
+            float 3 array: v0_m - 
+            float 3 array: v1_m - 
+            float 3 array: vp_m - 
+            float 3 array: va_m - 
     
-    }
-
-    Returns:
-    ---------------
-
     """
-
-    ##  Debug Package Loading
-    print(spice.tkvrsn('TOOLKIT'))
-
-    # Load SPICE kernels
-    spice.furnsh(f"{sp_path}/Spice_Kernels/de421.bsp")
-    spice.furnsh(f"{sp_path}/Spice_Kernels/naif0012.tls")
-
-    # Convert to Ephemeris Time
-    et_de0 = spice.str2et(dict_values["d_time0"])
-    et_de1 = spice.str2et(dict_values["d_time1"])
-    et_ar0 = spice.str2et(dict_values["a_time0"])
-    et_ar1 = spice.str2et(dict_values["a_time1"])
-
-    ##  Ephemeris time arrays
-    ets_de = np.arange(et_de0, et_de1, dict_values["step"])
-    ets_ar = np.arange(et_ar0, et_ar1, dict_values["step"])
-
-    #   Collect trajectory data
-    trajectory_departure = np.array([spice.spkezr(dict_values["origin"], et, dict_values["frame"], dict_values["abcorr"], dict_values["observer"])[0] for et in ets_de])
-    trajectory_arrival = np.array([spice.spkezr(dict_values["target"], et, dict_values["frame"], dict_values["abcorr"], dict_values["observer"])[0] for et in ets_ar])
-
-    v0_m = np.zeros((len(trajectory_arrival),len(trajectory_departure), 3))
-    v1_m = np.zeros((len(trajectory_arrival),len(trajectory_departure), 3))
-    vp_m = np.zeros((len(trajectory_arrival),len(trajectory_departure), 3))
-    va_m = np.zeros((len(trajectory_arrival),len(trajectory_departure), 3))
-    tf_m = np.zeros((len(trajectory_arrival),len(trajectory_departure)))
-
-    ##--Programming Loop--##
-
-    debug_message = ''
-
-    CURSOR_UP = "\033[1A"
-    CLEAR = "\x1b[2K"
-
-    print('Getting c3 array...')
-
     for i, _ in enumerate(trajectory_arrival):
-
-        debug_message = f'Generating Layers {i} of {len(trajectory_arrival)}'
+        ## Debug message
+        debug_message = f'Generating Layers: {100 * i / len(trajectory_arrival)}% complete'
         print(debug_message)
 
         for j, _ in enumerate(trajectory_departure):
-            
             ##  Define velocity vectors
             v0 = 1e20*u.km/u.s
             v = 1e20*u.km/u.s
             vp = trajectory_departure[j][3:]
             va = trajectory_arrival[i][3:]
 
-
             if ets_ar[i] - ets_de[j] < 0:
-                tf_m[i][j] = 1e20
-                v0_m[i][j] = 1e20
-                v1_m[i][j] = 1e20
-                vp_m[i][j] = vp
-                va_m[i][j] = va
-                continue
+                continue    ## Ignore negative time
 
             ##  Izzo Lambert Solver
             try:
-                lambert = izzo.lambert(Sun.k, trajectory_departure[j][:3]*u.km, trajectory_arrival[i][:3]*u.km, (ets_ar[i]*u.s - ets_de[j]*u.s),M=0)   # :3
+                lambert = izzo.lambert(
+                    Sun.k, trajectory_departure[j][:3]*u.km,
+                    trajectory_arrival[i][:3]*u.km,
+                    ets_ar[i]*u.s - ets_de[j]*u.s,M=no_rotations) # :3
                 v0, v = next(lambert)
+            except ImportError:
+                v0, v = None, None
 
-                tf_m[i][j] = (ets_ar[i] - ets_de[j])/(3600*24)
-            except:
-                print("Lambert solver failed")
+            yield v0, v, vp, va
 
-            v0_m[i][j] = v0
-            v1_m[i][j] = v
-            vp_m[i][j] = vp
-            va_m[i][j] = va
-
-        print(CURSOR_UP + CLEAR, end="")
+        print(CURSOR_UP + CLR, end="")
 
     ## Offload spice kernel to prevent data leaks
     spice.kclear()
+
+
+def generate_porkchop(dict_values,no_rotations=0):
+    """
+        Solve for velocity values in 2d meshgrid format    
     
-    return np.array([v0_m, v1_m, vp_m, va_m])
-
-
-def P_Match(pd, sp_path, v_infinity, time_of_flight):
-
-    config = P_CONFIG(**pd)
-
-    ##  Set the path to the image folder
-    image_folder = f"{sp_path}/fig/"
-
-    ##  Set the desired output video file name
-    output_video_file = f"{sp_path}/video_output/output_video.mp4"
-
-    ##  Output file name
-    output_plot_title = config.out_title
-
-
-    ##  Debug Package Loading
-    print(spice.tkvrsn('TOOLKIT'))
-
-
-
-    ##--Define departure and arrival parameters from spice kernels--##
-
-    #   Load SPICE kernels
-    spice.furnsh(f"{sp_path}/Spice_Kernels/de421.bsp")  # Ephemeris data
-    spice.furnsh(f"{sp_path}/Spice_Kernels/naif0012.tls")  # leap seconds
-
-    second_time = add_time_to_datetime(config.d_time0, time_of_flight)
-
-    et_de1 = spice.str2et(config.d_time1)
-
-    et_ar0 = spice.str2et(config.a_time0)
-    et_ar1 = spice.str2et(second_time)
-
-    ets_ar = np.arange(et_ar0, et_ar1, config.step)
-
-    dv_mag_2d = np.zeros((100, len(ets_ar)))
-
-    for dt in range(100):
-        #   Convert to Ephemeris Time
-        et_de0 = spice.str2et(add_time_to_datetime(config.d_time0, 3600*24*dt))
-
-        #   Collect trajectory data
-        trajectory_departure = spice.spkezr(config.origin, et_de0, config.frame, config.abcorr, config.observer)[0]
-
-        trajectory_arrival = np.array([spice.spkezr(config.target, et, config.frame, config.abcorr, config.observer)[0] for et in ets_ar])
-
-        tf_m = np.zeros((len(trajectory_arrival)))
-        dv_inf = np.zeros((len(trajectory_arrival), 3))
-
-
-        ##--Programming Loop--##
-
-        print('Getting Matching array...')
-
-        for i in range(len(ets_ar)):
-
-            ##  Define velocity vectors
-            v0 = 0*u.km/u.s
-            v = 0*u.km/u.s
-            vp = trajectory_departure[3:]
-            va = trajectory_arrival[i][3:]
-
-
-            ##  Izzo Lambert Solver
-            try:
-                lambert = izzo.lambert(Sun.k, trajectory_departure[:3]*u.km, trajectory_arrival[i][:3]*u.km, ets_ar[i]*u.s,M=0)   # :3
-                v0, v = next(lambert)
-
-                tf_m[i] = ets_ar[i]/(3600*24)
-            except:
-                v0, v = 1e10*u.km/u.s, 1e10*u.km/u.s
-
-
-            dv_inf[i,:] = (v0.value - vp)
-
-        dv_i = np.linalg.norm(v_infinity - dv_inf, axis=1)
-
-        #plt.plot(ets_ar, dv_i)
-        dv_mag_2d[dt] = dv_i
-        #plt.show()
-
-    return dv_mag_2d
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def getPlanetaryEphemeris(pd, sp_path):
-
-    config = P_CONFIG(**pd)
-
-    ##  Set the path to the image folder
-    image_folder = f"{sp_path}/fig/"
-
-    ##  Set the desired output video file name
-    output_video_file = f"{sp_path}/video_output/output_video.mp4"
-
-    ##  Output file name
-    output_plot_title = config.out_title
-
-
-    ##  Debug Package Loading
-    print(spice.tkvrsn('TOOLKIT'))
-
-
-
-    ##--Define departure and arrival parameters from spice kernels--##
-
-    #   Load SPICE kernels
-    spice.furnsh(f"{sp_path}/Spice_Kernels/de421.bsp")  # Ephemeris data
-    spice.furnsh(f"{sp_path}/Spice_Kernels/naif0012.tls")  # leap seconds
-
-
-    #   Convert to Ephemeris Time
-    et_de0 = spice.str2et(config.d_time0)
-    et_de1 = spice.str2et(config.d_time1)
-
-    et_ar0 = spice.str2et(config.a_time0)
-    et_ar1 = spice.str2et(config.a_time1)
-
-
-    ##  Ephemeris time arrays
-    ets_de = np.arange(et_de0, et_de1, config.step)
-    ets_ar = np.arange(et_ar0, et_ar1, config.step)
-
-
-    #   Collect trajectory data
-    trajectory_departure = np.array([spice.spkezr(config.origin, et, config.frame, config.abcorr, config.observer)[0] for et in ets_de])
-    trajectory_arrival = np.array([spice.spkezr(config.target, et, config.frame, config.abcorr, config.observer)[0] for et in ets_ar])
-
-    return trajectory_departure, trajectory_arrival
+        Returns:
+            float 3 array: v0_m - 
+            float 3 array: v1_m - 
+            float 3 array: vp_m - 
+            float 3 array: va_m - 
+    
+        Parameters:
+            dict_values {
+    
+                d_time0 - departure window lower bound
+                d_time1 - departure window upper bound
+                a_time0 - arrival window lower bound
+                a_time1 - arrival window upper bound
+    
+                target - 
+                origin - 
+                observer - 
+                frame - 
+                abcorr - 
+    
+                step - time step (recommended 1 day)
+                out_title - 
+            
+            }
+
+            int: no_rotations
+    """
+    setup_kernel()
+
+    ## Create ephemeris time arrays
+    ets_de = get_ephemeris_time(dict_values['d_time0'],dict_values['d_time1'],dict_values['step'])
+    ets_ar = get_ephemeris_time(dict_values['a_time0'],dict_values['a_time1'],dict_values['step'])
+
+    ## Collect trajectory data
+    __frame = dict_values["frame"]
+    __abcorr = dict_values["abcorr"]
+    __observer = dict_values["observer"]
+    trj_de = get_trajectory_data(dict_values["origin"], ets_de, __frame, __abcorr, __observer)
+    trj_ar = get_trajectory_data(dict_values["target"], ets_ar, __frame, __abcorr, __observer)
+
+    ## Generate solution grid and reshape to appropriate format
+    gen_arrays  = list(lambert_solve(trj_de, trj_ar, ets_de, ets_ar, no_rotations))
+    v0_m, v1_m, vp_m, va_m = tuple(np.array([r[i] for r in gen_arrays]) for i in range(4))
+    v0_m = v0_m.reshape(len(trj_ar), len(trj_de), 3)
+    v1_m = v1_m.reshape(len(trj_ar), len(trj_de), 3)
+    vp_m = vp_m.reshape(len(trj_ar), len(trj_de), 3)
+    va_m = va_m.reshape(len(trj_ar), len(trj_de), 3)
+
+    return v0_m, v1_m, vp_m, va_m
