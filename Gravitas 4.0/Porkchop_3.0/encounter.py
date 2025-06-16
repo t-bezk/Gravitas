@@ -53,29 +53,52 @@ class P_CONFIG:
 
 
 def porkchop_solve(dict_values):
+    """
+    Parameters:
+    ---------------
+    dict_values {
+
+        d_time0 - departure window lower bound
+        d_time1 - departure window upper bound
+        a_time0 - arrival window lower bound
+        a_time1 - arrival window upper bound
+
+        target - 
+        origin - 
+        observer - 
+        frame - 
+        abcorr - 
+
+        step - time step (recommended 1 day)
+        out_title - 
+    
+    }
+
+    Returns:
+    ---------------
+
+    """
 
     ##  Debug Package Loading
     print(spice.tkvrsn('TOOLKIT'))
 
-    ##--Define departure and arrival parameters from spice kernels--##
-    #   Load SPICE kernels
-    spice.furnsh(f"{sp_path}/Spice_Kernels/de421.bsp")  # Ephemeris data
-    spice.furnsh(f"{sp_path}/Spice_Kernels/naif0012.tls")  # leap seconds
+    # Load SPICE kernels
+    spice.furnsh(f"{sp_path}/Spice_Kernels/de421.bsp")
+    spice.furnsh(f"{sp_path}/Spice_Kernels/naif0012.tls")
 
-    #   Convert to Ephemeris Time
+    # Convert to Ephemeris Time
     et_de0 = spice.str2et(dict_values["d_time0"])
     et_de1 = spice.str2et(dict_values["d_time1"])
-
     et_ar0 = spice.str2et(dict_values["a_time0"])
     et_ar1 = spice.str2et(dict_values["a_time1"])
 
     ##  Ephemeris time arrays
-    ets_de = np.arange(et_de0, et_de1, config.step)
-    ets_ar = np.arange(et_ar0, et_ar1, config.step)
+    ets_de = np.arange(et_de0, et_de1, dict_values["step"])
+    ets_ar = np.arange(et_ar0, et_ar1, dict_values["step"])
 
     #   Collect trajectory data
-    trajectory_departure = np.array([spice.spkezr(config.origin, et, config.frame, config.abcorr, config.observer)[0] for et in ets_de])
-    trajectory_arrival = np.array([spice.spkezr(config.target, et, config.frame, config.abcorr, config.observer)[0] for et in ets_ar])
+    trajectory_departure = np.array([spice.spkezr(dict_values["origin"], et, dict_values["frame"], dict_values["abcorr"], dict_values["observer"])[0] for et in ets_de])
+    trajectory_arrival = np.array([spice.spkezr(dict_values["target"], et, dict_values["frame"], dict_values["abcorr"], dict_values["observer"])[0] for et in ets_ar])
 
     v0_m = np.zeros((len(trajectory_arrival),len(trajectory_departure), 3))
     v1_m = np.zeros((len(trajectory_arrival),len(trajectory_departure), 3))
@@ -92,12 +115,12 @@ def porkchop_solve(dict_values):
 
     print('Getting c3 array...')
 
-    for i in range(len(trajectory_arrival)):
+    for i, _ in enumerate(trajectory_arrival):
 
         debug_message = f'Generating Layers {i} of {len(trajectory_arrival)}'
         print(debug_message)
 
-        for j in range(len(trajectory_departure)):
+        for j, _ in enumerate(trajectory_departure):
             
             ##  Define velocity vectors
             v0 = 1e20*u.km/u.s
@@ -121,7 +144,7 @@ def porkchop_solve(dict_values):
 
                 tf_m[i][j] = (ets_ar[i] - ets_de[j])/(3600*24)
             except:
-                pass
+                print("Lambert solver failed")
 
             v0_m[i][j] = v0
             v1_m[i][j] = v
@@ -135,18 +158,6 @@ def porkchop_solve(dict_values):
     
     return np.array([v0_m, v1_m, vp_m, va_m])
 
-
-
-
-
-
-
-
-
-
-
-
-import matplotlib.pyplot as plt
 
 def P_Match(pd, sp_path, v_infinity, time_of_flight):
 
