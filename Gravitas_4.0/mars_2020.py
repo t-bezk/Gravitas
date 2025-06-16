@@ -1,6 +1,6 @@
 """""""""""""""""""""""""""""""""
 ----------------------------------
-GRAVITAS v.4.0.1 - porkchop_plot module
+GRAVITAS v.4.0.1 - mars2020 demo
 by Tomas Bezkorowajnyj c. February 2025
 ----------------------------------
 """""""""""""""""""""""""""""""""
@@ -8,7 +8,7 @@ by Tomas Bezkorowajnyj c. February 2025
 import pathlib
 import numpy as np
 from matplotlib import pyplot as plt
-from encounter import generate_porkchop
+from encounters import generate_porkchop
 from dictionaries import m_2020
 
 ##  Retrieve local file directory

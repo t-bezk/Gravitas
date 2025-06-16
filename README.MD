@@ -1,9 +1,13 @@
 # Gravitas - Python Based Gravity Assist Simulator
 
 *Made by: Tomas Bezkorowajnyj 2025*
+
 *Github: @Attempt4*
+
 *Version: 4.0.1*
+
 *Last updated: 16-06-2025*
+
 
 ===================
 
@@ -26,7 +30,7 @@ Gravitas is a python-based simulator which can predict dynamic paths between pla
 
 ### Updates since v.3.0
 
-Clutter files from previous installments have been removed. Porkchop plot generator and dict definitions for encounter can be located in `ephemeris_plot.py`.
+Clutter files from previous installments have been removed.
 
 ### Boilerplates
 
@@ -53,7 +57,7 @@ In a new file, create a dictionary variable with the following indices.
 > ```
 These indices define the initial conditions and windows within which trajectories can be simulated. Difinitions for planet names can be found in the spiceypy documentation.
 
-Now call the function `generate_porkchop()` to generate an array of values for velocity. Note that the size of the arrays generated depend on the window size and the timestep. Smaller increments will take longer to generate, so a recommended step of 86400 seconds (one day) is default. The code below is from the file `porkchop_plot.py` and generates a contour plot of the c3 and v_departure magnitudes from different transfers.
+Now call the function `generate_porkchop()` to generate an array of values for velocity. Note that the size of the arrays generated depend on the window size and the timestep. Smaller increments will take longer to generate, so a recommended step of 86400 seconds (one day) is default. The code below is from the file `mars_2020.py` and generates a contour plot of the c3 and v_departure magnitudes from different transfers.
 
 > ```py
 > import pathlib
@@ -90,16 +94,5 @@ Now call the function `generate_porkchop()` to generate an array of values for v
 
 ### Documentation
 
-
-
-
-
-
-
-
-
-
-
----
 
 

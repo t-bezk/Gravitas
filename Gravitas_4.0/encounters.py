@@ -77,8 +77,6 @@ def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_r
             ##  Define velocity vectors
             v0 = 1e20*u.km/u.s
             v = 1e20*u.km/u.s
-            vp = trajectory_departure[j][3:]
-            va = trajectory_arrival[i][3:]
 
             if ets_ar[i] - ets_de[j] < 0:
                 continue    ## Ignore negative time
@@ -93,7 +91,7 @@ def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_r
             except ImportError:
                 v0, v = None, None
 
-            yield v0, v, vp, va
+            yield v0, v, trajectory_departure[j][3:], trajectory_arrival[i][3:]
 
         print(CURSOR_UP + CLR, end="")
 
