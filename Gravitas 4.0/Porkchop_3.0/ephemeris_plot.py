@@ -64,10 +64,9 @@ e_2020 = {
 ##  Retrieve local file directory
 dir = pathlib.Path(__file__).parent.resolve()
 
-
 """--Plot porkchops with c3 and v-infinity data--"""
 
-## Transfer between planets as layed out in definition of m_2020
+## Transfer between planets as layed out in transfer definition
 v0,v1,vp,va  = porkchop_solve(m_2020)
 
 ##  Define meshgrids for contour plot
