@@ -3,6 +3,7 @@
 GRAVITAS v.4.0.1 - encounter module
 by Tomas Bezkorowajnyj c. February 2025
 ----------------------------------
+----------------------------------
 """""""""""""""""""""""""""""""""
 
 import pathlib
