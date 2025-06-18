@@ -1,5 +1,18 @@
+"""""""""""""""""""""""""""""""""
+----------------------------------
+GRAVITAS v.4.0.1 - timestep physics module
+by Tomas Bezkorowajnyj c. February 2025
+----------------------------------
+"""""""""""""""""""""""""""""""""
 
-from math_func import *
+
+mu = 6.67e-11*1.989e30
+
+au = 1.495979e11
+
+auday = au*1.1574e-5
+
+dt = 100
 
 import numpy as np
 

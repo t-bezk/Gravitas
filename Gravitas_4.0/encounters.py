@@ -1,8 +1,7 @@
 """""""""""""""""""""""""""""""""
 ----------------------------------
 GRAVITAS v.4.0.1 - encounter module
-by Tomas Bezkorowajnyj c. February 2025
-----------------------------------
+by Tomas Bezkorowajnyj c. June 2025
 ----------------------------------
 """""""""""""""""""""""""""""""""
 
@@ -20,12 +19,7 @@ CLR = "\x1b[2K"
 
 
 def setup_kernel():
-    """
-        Locate spice kernel data
-
-        Returns:
-            None
-    """
+    """Locate spice kernel data"""
     ## Debug Package Loading
     try:
         print(spice.tkvrsn('TOOLKIT'))
@@ -38,12 +32,7 @@ def setup_kernel():
 
 
 def get_ephemeris_time(lower_bond, upper_bound, time_step):
-    """
-        Convert to ephemeris time and return ordered array
-
-        Returns:
-            float: 
-    """
+    """Convert to ephemeris time and return ordered array"""
     eph0, eph1 = spice.str2et(lower_bond), spice.str2et(upper_bound)
     return np.arange(eph0, eph1, time_step)
 
@@ -63,22 +52,23 @@ def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_r
             int: no_rotations = 0
 
         Returns:
-            float 3 array: v0_m - 
-            float 3 array: v1_m - 
-            float 3 array: vp_m - 
-            float 3 array: va_m - 
+            tuple[float,float,float]: v0_m - ,
+            
+            tuple[float,float,float]: v1_m - ,
+            
+            tuple[float,float,float]: vp_m - ,
+            
+            tuple[float,float,float]: va_m - 
     
     """
     for i, _ in enumerate(trajectory_arrival):
-        ## Debug message
         debug_message = f'Generating Layers: {100 * i / len(trajectory_arrival)}% complete'
         print(debug_message)
-
         for j, _ in enumerate(trajectory_departure):
+            
             ##  Define velocity vectors
             v0 = 1e20*u.km/u.s
             v = 1e20*u.km/u.s
-
             if ets_ar[i] - ets_de[j] < 0:
                 continue    ## Ignore negative time
 

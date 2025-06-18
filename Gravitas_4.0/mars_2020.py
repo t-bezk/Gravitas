@@ -1,7 +1,7 @@
 """""""""""""""""""""""""""""""""
 ----------------------------------
 GRAVITAS v.4.0.1 - mars2020 demo
-by Tomas Bezkorowajnyj c. February 2025
+by Tomas Bezkorowajnyj c. June 2025
 ----------------------------------
 """""""""""""""""""""""""""""""""
 
@@ -9,6 +9,7 @@ import pathlib
 import numpy as np
 from matplotlib import pyplot as plt
 from encounters import generate_porkchop
+from spice_video import visual_animation
 from dictionaries import m_2020
 
 ##  Retrieve local file directory
@@ -31,6 +32,7 @@ ax.set_title(f'{m_2020["out_title"]}')
 ax.set_xlabel(f'Departure Window (Days after UST:{m_2020["d_time0"]})')
 ax.set_ylabel(f'Arrival Window (Days after UST:{m_2020["a_time1"]})')
 fig.savefig(f'{PROJ_DIR}/video_output/{m_2020["out_title"]}.png')
+visual_animation(m_2020, "2020-12-01T00:00:00", "2021-12-01T00:00:00", vi)
 
 plt.show()
 plt.close()

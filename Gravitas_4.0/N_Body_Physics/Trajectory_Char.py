@@ -1,16 +1,17 @@
 #Trajectory_Char.py
 
-from display_manager import *
+from legacy_files.display_manager import displayOrbit
 
-from math_func import *
+mu = 6.67e-11*1.989e30
+au = 1.495979e11
+auday = au*1.1574e-5
+dt = 100
 
 import numpy as np
 
-def plotOrbs(i, sp_obj):
-    
+def plotOrbs(i, sp_obj):  
     R_e = au*np.array([sp_obj[0][i],sp_obj[1][i],sp_obj[2][i]])
     V_e = auday*np.array([sp_obj[3][i],sp_obj[4][i],sp_obj[5][i]])
-
     H_e = np.cross(R_e, V_e)
     R_e_mod = np.linalg.norm(R_e)
     V_e_mod = np.linalg.norm(V_e)
@@ -22,11 +23,9 @@ def plotOrbs(i, sp_obj):
     W_e = np.arccos(n_e[0]/np.linalg.norm(n_e))
     w_e = np.arccos(np.dot(n_e,e_e)/(np.linalg.norm(n_e)*np.linalg.norm(e_e)))
     a_e = -mu/(2*E_e)
-
     return displayOrbit(a_e,e_e,i_e,w_e,W_e)
 
 def getPlanetOrbit(i, sp_obj):
-    
     R_e = au*np.array([sp_obj[0][i],sp_obj[1][i],sp_obj[2][i]])
     V_e = auday*np.array([sp_obj[3][i],sp_obj[4][i],sp_obj[5][i]])
 
@@ -44,11 +43,7 @@ def getPlanetOrbit(i, sp_obj):
 
     return np.array([a_e,e_e,i_e,w_e,W_e])
 
-
-
-
 def plotTraj(V,R):
-
     H_e = np.cross(R, V)
     R_mod = np.linalg.norm(R)
     V_mod = np.linalg.norm(V)
@@ -60,13 +55,9 @@ def plotTraj(V,R):
     W_e = np.arccos(n_e[0]/np.linalg.norm(n_e))
     w_e = np.arccos(np.dot(n_e,e_e)/(np.linalg.norm(n_e)*np.linalg.norm(e_e)))
     a_e = -mu/(2*E_e)
-
     return displayOrbit(a_e,e_e,i_e,w_e,W_e)
 
-
-
 def getSpacecraftOrbit(V,R):
-
     H_e = np.cross(R, V)
     R_mod = np.norm(R)
     V_mod = np.norm(V)
@@ -78,6 +69,5 @@ def getSpacecraftOrbit(V,R):
     W_e = np.arccos(n_e[0]/np.norm(n_e))
     w_e = np.arccos(np.dot(n_e,e_e)/(np.norm(n_e)*np.norm(e_e)))
     a_e = -mu/(2*E_e)
-
     return ([a_e,e_e,i_e,w_e,W_e])
 
