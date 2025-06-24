@@ -6,12 +6,12 @@ by Tomas Bezkorowajnyj c. June 2025
 """""""""""""""""""""""""""""""""
 
 import pathlib
+from datetime import datetime, timedelta
 import numpy as np
 from matplotlib import pyplot as plt
 from encounters import generate_porkchop
 from spice_video import visual_animation
 from dictionaries import m_2020
-from datetime import datetime, timedelta
 
 ##  Retrieve local file directory
 PROJ_DIR = pathlib.Path(__file__).parent.resolve()
@@ -34,13 +34,12 @@ ax.set_xlabel(f'Departure Window (Days after UST:{m_2020["d_time0"]})')
 ax.set_ylabel(f'Arrival Window (Days after UST:{m_2020["a_time1"]})')
 fig.savefig(f'{PROJ_DIR}/video_output/{m_2020["out_title"]}.png')
 
-ind_dep = 10
-ind_arr = 10
-
-viq = v0[ind_dep][ind_arr]
-
-departure_time = datetime.strptime(m_2020['d_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=ind_dep*m_2020['step'])
-arrival_time = datetime.strptime(m_2020['a_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=ind_dep*m_2020['step'])
+IND_DEP = 15
+IND_ARR = 15
+viq = v0[IND_DEP][IND_ARR]
+print(viq)
+departure_time = datetime.strptime(m_2020['d_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=IND_DEP*m_2020['step'])
+arrival_time = datetime.strptime(m_2020['a_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=IND_ARR*m_2020['step'])
 
 visual_animation(m_2020, departure_time, arrival_time, viq)
 

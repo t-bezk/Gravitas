@@ -13,8 +13,7 @@ import encounters as en
 from Physics.Physics import updateVesselPhysics
 from Display.display_orbit import plot_trajectory
 
-
-
+## pathlib directory
 PROJ_DIR = pathlib.Path(__file__).parent.resolve()
 
 def visual_animation(dict_values, departure_time, arrival_time, velo):
@@ -26,7 +25,10 @@ def visual_animation(dict_values, departure_time, arrival_time, velo):
         arrival_time (_type_): _description_
         velocity (_type_): _description_
     """
+    ## setup kernel
     en.setup_kernel()
+    
+    ## load ephemeris
     eph_tme = en.get_ephemeris_time(str(departure_time), str(arrival_time), dict_values['step'])
     __frame = dict_values['frame']
     __abcorr = dict_values['abcorr']
@@ -46,9 +48,9 @@ def visual_animation(dict_values, departure_time, arrival_time, velo):
     fig, _ = plt.subplots(figsize=(10, 6))
     
     
-    orb_trj_a = plot_trajectory(eph_trj_a[0][:3],eph_trj_a[0][3:])
-    orb_trj_b = plot_trajectory(eph_trj_b[0][:3],eph_trj_b[0][3:])
-    orb_prb = plot_trajectory(prb_eph[0][:3],prb_eph[0][3:])
+    orb_trj_a = plot_trajectory(eph_trj_a[0][3:]*1e3,eph_trj_a[0][:3]*1e3) * 1e-3
+    orb_trj_b = plot_trajectory(eph_trj_b[0][3:]*1e3,eph_trj_b[0][:3]*1e3) * 1e-3
+    orb_prb = plot_trajectory(prb_eph[0][3:]*1e3,prb_eph[0][:3]*1e3) * 1e-3
     
 
     ## Function to update the plot for each frame of the animation
@@ -60,13 +62,13 @@ def visual_animation(dict_values, departure_time, arrival_time, velo):
         ax.set_zlim(-5e7, 5e7)
         
         ax.scatter(eph_trj_a[i][0], eph_trj_a[i][1], eph_trj_a[i][2])
-        #ax.plot(orb_trj_a[0],orb_trj_a[1],orb_trj_a[2])
+        ax.plot(-orb_trj_a[0],-orb_trj_a[1],-orb_trj_a[2])
         
         ax.scatter(eph_trj_b[i][0], eph_trj_b[i][1], eph_trj_b[i][2])
-        #ax.plot(orb_trj_b[0],orb_trj_b[1],orb_trj_b[2])
+        ax.plot(-orb_trj_b[0],-orb_trj_b[1],-orb_trj_b[2])
         
-        ax.scatter(prb_eph[i][0],   prb_eph[i][1],   prb_eph[i][2]  )
-        #ax.plot(orb_prb[0],orb_prb[1],orb_prb[2])
+        ax.scatter(prb_eph[i][0],prb_eph[i][1],prb_eph[i][2])
+        ax.plot(-orb_prb[0],-orb_prb[1],orb_prb[2])
         
     plt.grid(None)
 

@@ -60,7 +60,7 @@ def display_orbit(a,e,i,omega,Omega):
     x = R11 * x_prime + R12 * y_prime + R13 * z_prime
     y = R21 * x_prime + R22 * y_prime + R23 * z_prime
     z = R31 * x_prime + R32 * y_prime + R33 * z_prime
- 
+
     ## Return 3d position components
     return np.array([x,y,z])
 
