@@ -65,7 +65,6 @@ def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_r
         debug_message = f'Generating Layers: {100 * i / len(trajectory_arrival)}% complete'
         print(debug_message)
         for j, _ in enumerate(trajectory_departure):
-            
             ##  Define velocity vectors
             v0 = 1e20*u.km/u.s
             v = 1e20*u.km/u.s

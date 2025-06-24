@@ -31,32 +31,29 @@ def updatePlanetaryPhysics(i, sp_obj):
     sp_obj[1][i] += vel_0[1] * dt / au
     sp_obj[2][i] += vel_0[2] * dt / au
 
-def updateVesselPhysics(x_vec, v_vec):
+def updateVesselPhysics(x_vec, v_vec, deltatime=dt):
+    """_summary_
 
-    pos_0 = au*x_vec
-    vel_0 = auday*v_vec
-    
-    acc = -mu * np.power(np.linalg.norm(pos_0),-2) * (pos_0 / np.linalg.norm(pos_0))
+    Args:
+        x_vec (_type_): _description_
+        v_vec (_type_): _description_
+        deltatime (_type_, optional): _description_. Defaults to dt.
+    """
 
-    vel_0[0] += acc[0] * dt
-    vel_0[1] += acc[1] * dt
-    vel_0[2] += acc[2] * dt
-    
-    pos_0[0] += vel_0[0] * dt
-    pos_0[1] += vel_0[1] * dt
-    pos_0[2] += vel_0[2] * dt
+    pos_0 = x_vec
+    vel_0 = v_vec
+    acc = - mu * np.power(np.linalg.norm(pos_0),-2) * (pos_0 / np.linalg.norm(pos_0)) * 1e-9
 
-    vel_0[0] /= auday
-    vel_0[1] /= auday
-    vel_0[2] /= auday
+    vel_0[0] += acc[0] * deltatime
+    vel_0[1] += acc[1] * deltatime
+    vel_0[2] += acc[2] * deltatime
 
-    pos_0[0] /= au
-    pos_0[1] /= au
-    pos_0[2] /= au
+    pos_0[0] += vel_0[0] * deltatime
+    pos_0[1] += vel_0[1] * deltatime
+    pos_0[2] += vel_0[2] * deltatime
 
-    return [pos_0, vel_0]
+    return np.concatenate([pos_0, vel_0])
 
 
 if __name__ == "__main__":
-    
     print("Physics.py successfully loaded")

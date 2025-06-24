@@ -1,10 +1,31 @@
-#display_manager.py
-
+"""""""""""""""""""""""""""""""""
+----------------------------------
+GRAVITAS v.4.0.1 - display module
+by Tomas Bezkorowajnyj c. June 2025
+----------------------------------
+"""""""""""""""""""""""""""""""""
 
 import numpy as np
 
-def displayOrbit(a,e,i,omega,Omega):
-    
+mu = 6.67e-11*1.989e30
+au = 1.495979e11
+auday = au*1.1574e-5
+dt = 100
+
+
+def display_orbit(a,e,i,omega,Omega):
+    """_summary_
+
+    Args:
+        a (_type_): _description_
+        e (_type_): _description_
+        i (_type_): _description_
+        omega (_type_): _description_
+        Omega (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     # Generate true anomaly values from 0 to 2π
     nu = np.linspace(0, 2 * np.pi, 500)
 
@@ -14,7 +35,7 @@ def displayOrbit(a,e,i,omega,Omega):
     # Position in the orbital plane (x', y')
     x_prime = r * np.cos(nu)
     y_prime = r * np.sin(nu)
-    z_prime = np.zeros_like(nu)  # z' is zero in the orbital plane
+    z_prime = np.zeros_like(nu)
 
     # Rotation matrix components (to transform the orbit to 3D space)
     cos_Omega = np.cos(Omega)
@@ -39,11 +60,30 @@ def displayOrbit(a,e,i,omega,Omega):
     x = R11 * x_prime + R12 * y_prime + R13 * z_prime
     y = R21 * x_prime + R22 * y_prime + R23 * z_prime
     z = R31 * x_prime + R32 * y_prime + R33 * z_prime
-
-    
+ 
+    ## Return 3d position components
     return np.array([x,y,z])
 
 
-if __name__ == "__main__":
-    
-    print("display_manager.py successfully loaded")
+def plot_trajectory(V,R):
+    """_summary_
+
+    Args:
+        V (_type_): _description_
+        R (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    H_e = np.cross(R, V)
+    R_mod = np.linalg.norm(R)
+    V_mod = np.linalg.norm(V)
+    E_e = V_mod**2 / 2 - mu / R_mod
+    H_e_mod = np.linalg.norm(H_e)
+    e_e = np.cross(V, H_e) / mu - R / R_mod
+    n_e = np.cross([0,0,1], H_e)
+    i_e = np.arccos(H_e[2]/H_e_mod)
+    W_e = np.arccos(n_e[0]/np.linalg.norm(n_e))
+    w_e = np.arccos(np.dot(n_e,e_e)/(np.linalg.norm(n_e)*np.linalg.norm(e_e)))
+    a_e = -mu/(2*E_e)
+    return display_orbit(a_e,e_e,i_e,w_e,W_e)
