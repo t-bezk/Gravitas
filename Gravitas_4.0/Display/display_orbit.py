@@ -7,11 +7,9 @@ by Tomas Bezkorowajnyj c. June 2025
 
 import numpy as np
 
-mu = 6.67e-11*1.989e30
-au = 1.495979e11
-auday = au*1.1574e-5
-dt = 100
-
+MU = 6.67e-11*1.989e30
+AU = 1.495979e11
+AUDAY = AU*1.1574e-5
 
 def display_orbit(a,e,i,omega,Omega):
     """_summary_
@@ -78,12 +76,12 @@ def plot_trajectory(V,R):
     H_e = np.cross(R, V)
     R_mod = np.linalg.norm(R)
     V_mod = np.linalg.norm(V)
-    E_e = V_mod**2 / 2 - mu / R_mod
+    E_e = V_mod**2 / 2 - MU / R_mod
     H_e_mod = np.linalg.norm(H_e)
-    e_e = np.cross(V, H_e) / mu - R / R_mod
+    e_e = np.cross(V, H_e) / MU - R / R_mod
     n_e = np.cross([0,0,1], H_e)
     i_e = np.arccos(H_e[2]/H_e_mod)
     W_e = np.arccos(n_e[0]/np.linalg.norm(n_e))
     w_e = np.arccos(np.dot(n_e,e_e)/(np.linalg.norm(n_e)*np.linalg.norm(e_e)))
-    a_e = -mu/(2*E_e)
+    a_e = -MU/(2*E_e)
     return display_orbit(a_e,e_e,i_e,w_e,W_e)

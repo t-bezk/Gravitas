@@ -16,6 +16,12 @@ from dictionaries import m_2020
 ##  Retrieve local file directory
 PROJ_DIR = pathlib.Path(__file__).parent.resolve()
 
+def get_min(arr) -> tuple[float,float]:
+    """Get indices for 2d array minimum value"""
+    arr_min = np.min(arr)
+    return np.concatenate(np.where(arr==arr_min))
+
+
 ## Transfer between planets as layed out in transfer definition
 v0, v1, vp, va  = generate_porkchop(m_2020)
 
@@ -34,12 +40,17 @@ ax.set_xlabel(f'Departure Window (Days after UST:{m_2020["d_time0"]})')
 ax.set_ylabel(f'Arrival Window (Days after UST:{m_2020["a_time1"]})')
 fig.savefig(f'{PROJ_DIR}/video_output/{m_2020["out_title"]}.png')
 
-IND_DEP = 15
-IND_ARR = 15
-viq = v0[IND_DEP][IND_ARR]
-print(viq)
-departure_time = datetime.strptime(m_2020['d_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=IND_DEP*m_2020['step'])
-arrival_time = datetime.strptime(m_2020['a_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=IND_ARR*m_2020['step'])
+IND_DEP = 80
+IND_ARR = 60
+
+iy, ix = get_min(vi)
+viq = v0[iy][ix]
+
+print(np.min(vi))
+print(ix,iy)
+
+departure_time = datetime.strptime(m_2020['d_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(ix)*m_2020['step'])
+arrival_time = datetime.strptime(m_2020['a_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(iy)*m_2020['step'])
 
 visual_animation(m_2020, departure_time, arrival_time, viq)
 
