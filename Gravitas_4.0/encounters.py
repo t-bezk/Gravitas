@@ -12,19 +12,19 @@ from poliastro.iod import izzo
 from poliastro.bodies import Sun
 from astropy import units as u
 
+## project constants
 PROJ_DIR = pathlib.Path(__file__).parent.resolve()
-SP_DIR = 'Spice_Kernels'    ## Directory from project folder to spice kernels
+SP_DIR = 'Spice_Kernels'    ## Kernel dir
 CURSOR_UP = "\033[1A"
 CLR = "\x1b[2K"
 
 
 def setup_kernel():
     """Locate spice kernel data"""
-    ## Debug Package Loading
     try:
         print(spice.tkvrsn('TOOLKIT'))
     except NotImplementedError as e:
-        raise ValueError("Toolkit not found") from e
+        raise ValueError(f'Toolkit not found: {e}') from e
 
     ## Load SPICE kernels from file
     spice.furnsh(f"{PROJ_DIR}/{SP_DIR}/de421.bsp")
@@ -43,23 +43,17 @@ def get_trajectory_data(origin, ets, frame, abcorr, observer):
 
 
 def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_rotations=0):
-    """
-        Pararmeters:
-            ndarray: trajectory_departure
-            ndarray: trajectory_arrival
-            ndarray: ets_de
-            ndarray: ets_ar
-            int: no_rotations = 0
+    """_summary_
 
-        Returns:
-            tuple[float,float,float]: v0_m - ,
-            
-            tuple[float,float,float]: v1_m - ,
-            
-            tuple[float,float,float]: vp_m - ,
-            
-            tuple[float,float,float]: va_m - 
-    
+    Args:
+        trajectory_departure (_type_): _description_
+        trajectory_arrival (_type_): _description_
+        ets_de (_type_): _description_
+        ets_ar (_type_): _description_
+        no_rotations (int, optional): _description_. Defaults to 0.
+
+    Yields:
+        _type_: _description_
     """
     for i, _ in enumerate(trajectory_arrival):
         debug_message = f'Generating Layers: {100 * i / len(trajectory_arrival)}% complete'
@@ -90,46 +84,23 @@ def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_r
 
 
 def generate_porkchop(dict_values,no_rotations=0):
-    """
-        Solve for velocity values in 2d meshgrid format    
-    
-        Returns:
-            float 3 array: v0_m - 
-            float 3 array: v1_m - 
-            float 3 array: vp_m - 
-            float 3 array: va_m - 
-    
-        Parameters:
-            dict_values {
-    
-                d_time0 - departure window lower bound
-                d_time1 - departure window upper bound
-                a_time0 - arrival window lower bound
-                a_time1 - arrival window upper bound
-    
-                target - 
-                origin - 
-                observer - 
-                frame - 
-                abcorr - 
-    
-                step - time step (recommended 1 day)
-                out_title - 
-            
-            }
+    """Solve for velocity values in 2d meshgrid format
 
-            int: no_rotations
+    Args:
+        dict_values (_type_): _description_
+        no_rotations (int, optional): _description_. Defaults to 0.
+
+    Returns:
+        _type_: _description_
     """
     setup_kernel()
 
-    ## Create ephemeris time arrays
-    ets_de = get_ephemeris_time(dict_values['d_time0'],dict_values['d_time1'],dict_values['step'])
-    ets_ar = get_ephemeris_time(dict_values['a_time0'],dict_values['a_time1'],dict_values['step'])
-
-    ## Collect trajectory data
+    ## Load ephemeris data
     __frame = dict_values["frame"]
     __abcorr = dict_values["abcorr"]
     __observer = dict_values["observer"]
+    ets_de = get_ephemeris_time(dict_values['d_time0'],dict_values['d_time1'],dict_values['step'])
+    ets_ar = get_ephemeris_time(dict_values['a_time0'],dict_values['a_time1'],dict_values['step'])
     trj_de = get_trajectory_data(dict_values["origin"], ets_de, __frame, __abcorr, __observer)
     trj_ar = get_trajectory_data(dict_values["target"], ets_ar, __frame, __abcorr, __observer)
 

@@ -10,11 +10,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as atn
 import encounters as en
-from Physics.physics import updateVesselPhysics
+from Physics.physics import update_vessel_physics
 from Display.display_orbit import plot_trajectory
 
 ## pathlib directory
 PROJ_DIR = pathlib.Path(__file__).parent.resolve()
+
 
 def visual_animation(dict_values, departure_time, arrival_time, velo):
     """generates GIF of orbital transfer given specified parameters
@@ -42,7 +43,7 @@ def visual_animation(dict_values, departure_time, arrival_time, velo):
     for q, _ in enumerate(prb_eph):
         if q == 0:
             continue
-        prb_eph[q] = updateVesselPhysics(prb_eph[q-1][:3],prb_eph[q-1][3:], dict_values['step'])
+        prb_eph[q] = update_vessel_physics(prb_eph[q-1][:3],prb_eph[q-1][3:], dict_values['step'])
 
     ## Create a figure and axes
     fig, _ = plt.subplots(figsize=(10, 6))

@@ -16,6 +16,7 @@ from dictionaries import m_2020
 ##  Retrieve local file directory
 PROJ_DIR = pathlib.Path(__file__).parent.resolve()
 
+
 def get_min(arr) -> tuple[float,float]:
     """Get indices for 2d array minimum value"""
     arr_min = np.min(arr)
