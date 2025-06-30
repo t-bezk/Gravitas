@@ -9,7 +9,7 @@ import pathlib
 from datetime import datetime, timedelta
 import numpy as np
 from matplotlib import pyplot as plt
-from encounters import generate_porkchop
+from encounters import generate_porkchop, setup_kernel, destroy_kernel
 from spice_video import visual_animation
 from dictionaries import m_2020
 
@@ -24,6 +24,8 @@ def get_min(arr) -> tuple[float,float]:
 
 
 ## Transfer between planets as layed out in transfer definition
+setup_kernel()
+
 v0, v1, vp, va  = generate_porkchop(m_2020)
 
 ##  Define meshgrids for contour plot
@@ -57,3 +59,5 @@ visual_animation(m_2020, departure_time, arrival_time, viq)
 
 plt.show()
 plt.close()
+
+destroy_kernel()

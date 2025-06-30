@@ -11,6 +11,7 @@ import spiceypy as spice
 from poliastro.iod import izzo
 from poliastro.bodies import Sun
 from astropy import units as u
+from Physics.physics import update_vessel_physics
 
 ## project constants
 PROJ_DIR = pathlib.Path(__file__).parent.resolve()
@@ -30,6 +31,9 @@ def setup_kernel():
     spice.furnsh(f"{PROJ_DIR}/{SP_DIR}/de421.bsp")
     spice.furnsh(f"{PROJ_DIR}/{SP_DIR}/naif0012.tls")
 
+def destroy_kernel():
+    """Clear kernel"""
+    spice.kclear()
 
 def get_ephemeris_time(lower_bond, upper_bound, time_step):
     """Convert to ephemeris time and return ordered array"""
@@ -42,13 +46,13 @@ def get_trajectory_data(origin, ets, frame, abcorr, observer):
     return [spice.spkezr(origin, et, frame, abcorr, observer)[0] for et in ets]
 
 
-def load_ephemeris_arrays(dict_values,d_t0,a_t0,bdy):
+def load_ephemeris_arrays(dict_values,d_t0,a_t0,bdy_tag):
     """Returns position and velocity arrays for both departure and arrival windows"""
     __frame = dict_values["frame"]
     __abcorr = dict_values["abcorr"]
     __observer = dict_values["observer"]
     ets = get_ephemeris_time(str(d_t0), str(a_t0), dict_values['step'])
-    trj = get_trajectory_data(dict_values[bdy], ets, __frame, __abcorr, __observer)
+    trj = get_trajectory_data(dict_values[bdy_tag], ets, __frame, __abcorr, __observer)
 
     return ets, trj
 
@@ -90,24 +94,24 @@ def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_r
 
         print(CURSOR_UP + CLR, end="")
 
-    ## Offload spice kernel to prevent data leaks
-    spice.kclear()
 
 
 def generate_porkchop(di,no_rotations=0):
     """Solve for velocity values in 2d meshgrid format
 
     Args:
-        di (_type_): _description_
+        di (_type_): dictionary values
         no_rotations (int, optional): _description_. Defaults to 0.
 
     Returns:
         ndarray(4,N,3): velocity characteristics of simulation
     """
-    setup_kernel()
 
-    ets_de, trj_de = load_ephemeris_arrays(di,di['d_time0'],di['d_time1'],'origin')
-    ets_ar, trj_ar = load_ephemeris_arrays(di,di['a_time0'],di['a_time1'],'target')
+    try:
+        ets_de, trj_de = load_ephemeris_arrays(di,di['d_time0'],di['d_time1'],'origin')
+        ets_ar, trj_ar = load_ephemeris_arrays(di,di['a_time0'],di['a_time1'],'target')
+    except NotImplementedError as e:
+        print(f'Kernal not setup: {e}')
 
     ## Generate solution grid and reshape to appropriate format
     gen_arrays  = list(lambert_solve(trj_de, trj_ar, ets_de, ets_ar, no_rotations))
@@ -118,3 +122,22 @@ def generate_porkchop(di,no_rotations=0):
     va_m = va_m.reshape(len(trj_ar), len(trj_de), 3)
 
     return v0_m, v1_m, vp_m, va_m
+
+def timestepped_ephemeris(dict_values,eph_trj_a,eph_trj_b,velo):
+    """_summary_
+
+    Args:
+        dict_values (_type_): _description_
+        t_de (_type_): _description_
+        t_ar (_type_): _description_
+        velo (_type_): _description_
+    """
+    ## generate transfer positions
+    prb_eph = np.zeros(shape=(len(eph_trj_a),6))
+    prb_eph[0] = np.concatenate([eph_trj_b[0][:3], velo])   ## :3
+    for q, _ in enumerate(prb_eph):
+        if q == 0:
+            continue
+        prb_eph[q] = update_vessel_physics(prb_eph[q-1][:3],prb_eph[q-1][3:], dict_values['step'])
+
+    return prb_eph

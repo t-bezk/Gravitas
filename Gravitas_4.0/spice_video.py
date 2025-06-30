@@ -16,28 +16,21 @@ from Display.display_orbit import plot_trajectory
 ## pathlib directory
 PROJ_DIR = pathlib.Path(__file__).parent.resolve()
 
-def visual_animation(dict_values, departure_time, arrival_time, velo):
+def visual_animation(dict_values, t_de, t_ar, velo):
     """generates GIF of orbital transfer given specified parameters
 
     Args:
         dict_values (dictionary): dictionaty
-        departure_time (string): departure time
-        arrival_time (string): arrival time
+        t_de (string): departure time
+        t_ar (string): arrival time
         velocity (string 3_): initial velocity of probe relative to sun on departure
     """
-    ## setup kernel
-    en.setup_kernel()
 
     ## load ephemeris
-    eph_tme,eph_trj_a = en.load_ephemeris_arrays(dict_values, departure_time, arrival_time,'target')
-    _, eph_trj_b = en.load_ephemeris_arrays(dict_values, departure_time, arrival_time,'origin')
-    ## generate transfer positions
-    prb_eph = np.zeros(shape=(len(eph_trj_a),6))
-    prb_eph[0] = np.concatenate([eph_trj_b[0][:3], velo])
-    for q, _ in enumerate(prb_eph):
-        if q == 0:
-            continue
-        prb_eph[q] = update_vessel_physics(prb_eph[q-1][:3],prb_eph[q-1][3:], dict_values['step'])
+    eph_tme,eph_trj_a = en.load_ephemeris_arrays(dict_values, t_de, t_ar,'target')
+    _, eph_trj_b = en.load_ephemeris_arrays(dict_values, t_de, t_ar,'origin')
+
+    prb_eph = en.timestepped_ephemeris(dict_values,eph_trj_a,eph_trj_b,velo)
 
     ## Create a figure and axes
     fig, _ = plt.subplots(figsize=(10, 6))
