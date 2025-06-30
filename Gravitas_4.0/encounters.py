@@ -42,6 +42,17 @@ def get_trajectory_data(origin, ets, frame, abcorr, observer):
     return [spice.spkezr(origin, et, frame, abcorr, observer)[0] for et in ets]
 
 
+def load_ephemeris_arrays(dict_values,d_t0,a_t0,bdy):
+    """Returns position and velocity arrays for both departure and arrival windows"""
+    __frame = dict_values["frame"]
+    __abcorr = dict_values["abcorr"]
+    __observer = dict_values["observer"]
+    ets = get_ephemeris_time(str(d_t0), str(a_t0), dict_values['step'])
+    trj = get_trajectory_data(dict_values[bdy], ets, __frame, __abcorr, __observer)
+
+    return ets, trj
+
+
 def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_rotations=0):
     """_summary_
 
@@ -83,26 +94,20 @@ def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_r
     spice.kclear()
 
 
-def generate_porkchop(dict_values,no_rotations=0):
+def generate_porkchop(di,no_rotations=0):
     """Solve for velocity values in 2d meshgrid format
 
     Args:
-        dict_values (_type_): _description_
+        di (_type_): _description_
         no_rotations (int, optional): _description_. Defaults to 0.
 
     Returns:
-        _type_: _description_
+        ndarray(4,N,3): velocity characteristics of simulation
     """
     setup_kernel()
 
-    ## Load ephemeris data
-    __frame = dict_values["frame"]
-    __abcorr = dict_values["abcorr"]
-    __observer = dict_values["observer"]
-    ets_de = get_ephemeris_time(dict_values['d_time0'],dict_values['d_time1'],dict_values['step'])
-    ets_ar = get_ephemeris_time(dict_values['a_time0'],dict_values['a_time1'],dict_values['step'])
-    trj_de = get_trajectory_data(dict_values["origin"], ets_de, __frame, __abcorr, __observer)
-    trj_ar = get_trajectory_data(dict_values["target"], ets_ar, __frame, __abcorr, __observer)
+    ets_de, trj_de = load_ephemeris_arrays(di,di['d_time0'],di['d_time1'],'origin')
+    ets_ar, trj_ar = load_ephemeris_arrays(di,di['a_time0'],di['a_time1'],'target')
 
     ## Generate solution grid and reshape to appropriate format
     gen_arrays  = list(lambert_solve(trj_de, trj_ar, ets_de, ets_ar, no_rotations))

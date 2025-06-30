@@ -12,17 +12,17 @@ AU = 1.495979e11
 AUDAY = AU*1.1574e-5
 
 def display_orbit(a,e,i,omega,Omega):
-    """_summary_
+    """generate a plottable trajectory path
 
     Args:
-        a (_type_): _description_
-        e (_type_): _description_
-        i (_type_): _description_
+        a (_type_): semi major axis
+        e (_type_): eccentricity
+        i (_type_): inclination angle
         omega (_type_): _description_
         Omega (_type_): _description_
 
     Returns:
-        _type_: _description_
+        ndarray: trajectory points
     """
     # Generate true anomaly values from 0 to 2π
     nu = np.linspace(0, 2 * np.pi, 500)

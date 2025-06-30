@@ -16,27 +16,21 @@ from Display.display_orbit import plot_trajectory
 ## pathlib directory
 PROJ_DIR = pathlib.Path(__file__).parent.resolve()
 
-
 def visual_animation(dict_values, departure_time, arrival_time, velo):
     """generates GIF of orbital transfer given specified parameters
 
     Args:
         dict_values (dictionary): dictionaty
-        departure_time (_str_): departure time
-        arrival_time (_str_): arrival time
-        velocity (_tuple 3_): initial velocity of probe relative to sun on departure
+        departure_time (string): departure time
+        arrival_time (string): arrival time
+        velocity (string 3_): initial velocity of probe relative to sun on departure
     """
     ## setup kernel
     en.setup_kernel()
 
     ## load ephemeris
-    eph_tme = en.get_ephemeris_time(str(departure_time), str(arrival_time), dict_values['step'])
-    __frame = dict_values['frame']
-    __abcorr = dict_values['abcorr']
-    __observer = dict_values['observer']
-    eph_trj_a = en.get_trajectory_data(dict_values['target'],eph_tme,__frame,__abcorr,__observer)
-    eph_trj_b = en.get_trajectory_data(dict_values['origin'],eph_tme,__frame,__abcorr,__observer)
-
+    eph_tme,eph_trj_a = en.load_ephemeris_arrays(dict_values, departure_time, arrival_time,'target')
+    _, eph_trj_b = en.load_ephemeris_arrays(dict_values, departure_time, arrival_time,'origin')
     ## generate transfer positions
     prb_eph = np.zeros(shape=(len(eph_trj_a),6))
     prb_eph[0] = np.concatenate([eph_trj_b[0][:3], velo])

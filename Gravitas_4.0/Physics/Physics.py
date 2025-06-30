@@ -17,9 +17,9 @@ def update_vessel_physics(x_vec, v_vec, deltatime=3600):
     """timestep probe position about parent object
 
     Args:
-        x_vec (_type_): _description_
-        v_vec (_type_): _description_
-        deltatime (_type_, optional): _description_. Defaults to dt.
+        x_vec (tuple): position vector
+        v_vec (tuple): velocity vector
+        deltatime (int): time step amount. Defaults to 3600.
     """
     pos_0 = x_vec
     vel_0 = v_vec
@@ -42,8 +42,8 @@ def update_planetary_physics(i, sp_obj,deltatime=3600):
     """timestep planetary position based on poliastro object profile
 
     Args:
-        i (_type_): _description_
-        sp_obj (_type_): _description_
+        i (int): object index
+        sp_obj (_type_): ephemeris data array [ pos, vel ]
     """
     pos_0 = AU * np.array([sp_obj[0][i],sp_obj[1][i],sp_obj[2][i]])
     vel_0 = AUDAY * np.array([sp_obj[3][i],sp_obj[4][i],sp_obj[5][i]])
