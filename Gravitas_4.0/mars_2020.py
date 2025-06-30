@@ -11,17 +11,11 @@ import numpy as np
 from matplotlib import pyplot as plt
 from encounters import generate_porkchop, setup_kernel, destroy_kernel
 from spice_video import visual_animation
+from time_stepped import get_min
 from dictionaries import m_2020
 
 ##  Retrieve local file directory
 PROJ_DIR = pathlib.Path(__file__).parent.resolve()
-
-
-def get_min(arr) -> tuple[float,float]:
-    """Get indices for 2d array minimum value"""
-    arr_min = np.min(arr)
-    return np.concatenate(np.where(arr==arr_min))
-
 
 ## Transfer between planets as layed out in transfer definition
 setup_kernel()

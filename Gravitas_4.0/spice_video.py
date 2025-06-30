@@ -6,7 +6,6 @@ by Tomas Bezkorowajnyj c. June 2025
 """""""""""""""""""""""""""""""""
 
 import pathlib
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as atn
 import encounters as en
@@ -25,12 +24,12 @@ def visual_animation(dict_values, t_de, t_ar, velo):
         t_ar (string): arrival time
         velocity (string 3_): initial velocity of probe relative to sun on departure
     """
-
-    ## load ephemeris
+    ## Get seperate time and position arrays from ephemeris data
     eph_tme,eph_trj_a = en.load_ephemeris_arrays(dict_values, t_de, t_ar,'target')
     _, eph_trj_b = en.load_ephemeris_arrays(dict_values, t_de, t_ar,'origin')
-
     prb_eph = en.timestepped_ephemeris(dict_values,eph_trj_a,eph_trj_b,velo)
+
+    print(en.get_min_dist(dict_values,eph_trj_a,eph_trj_b,velo))
 
     ## Create a figure and axes
     fig, _ = plt.subplots(figsize=(10, 6))
