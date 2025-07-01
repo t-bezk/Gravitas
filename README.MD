@@ -1,4 +1,4 @@
-# Gravitas - Python Based Gravity Assist Simulator
+# Gravitas v.4.0.1 - Gravity Assist Simulator
 
 *Made by: Tomas Bezkorowajnyj 2025*
 
@@ -11,13 +11,15 @@
 
 ===================
 
-Gravitas is a python-based simulator which can predict dynamic paths between planets. It can locate gravitational slingshot trajectories between planets within the solar system using a Lambert's solver and v-infinity matching. This is a developing passion project of which will be worked on solo and aims to be completed by the end of the summer. 
+Gravitas is a python-based simulator which can predict dynamic paths between planets. It utilises spice kernel data to locate gravitational slingshot trajectories between planets within the solar system using a Lambert's solver and v-infinity matching.
+
+This is a developing passion project of mine which will be worked on alone and aims to be completed by the end of the summer.
 
 ===================
 
 *To-do list:*
 
-- Clean and optimize porkchop code. Look into parallels
+~Clean and optimize porkchop code. Look into parallels~
 
 - Develop N-body simulator and suitable regression system: So that you can take results from a Lambert's solver and use it in a real N-body simulation
 
@@ -91,8 +93,5 @@ Now call the function `generate_porkchop()` to generate an array of values for v
 > plt.show()
 > 
 > ```
-
-### Documentation
-
 
 
