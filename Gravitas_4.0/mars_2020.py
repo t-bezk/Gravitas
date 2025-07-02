@@ -11,7 +11,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from encounters import generate_porkchop, setup_kernel, destroy_kernel
 from spice_video import visual_animation
-from time_stepped import get_min, perturbate_step
+from Display.figures import gen_porkchop_plot
+from time_stepped import get_min
 from dictionaries import m_2020
 
 ##  Retrieve local file directory
@@ -27,16 +28,7 @@ c3 = np.linalg.norm(v0 - vp, axis=2)**2
 vi = np.linalg.norm(v1 - va, axis=2)
 
 ##  Generate figure
-fig, ax = plt.subplots(figsize=(10,12))
-c3_contour = ax.contour(c3, levels=np.linspace(0,40,10), colors=[(0.0,0.0,1.0)])
-vi_contour = ax.contour(vi, levels=np.linspace(0,4,10), colors=[(1.0,0.0,0.0)])
-ax.clabel(c3_contour, inline=1, fontsize=10)
-ax.clabel(vi_contour, inline=1, fontsize=10)
-ax.set_title(f'{m_2020["out_title"]}')
-ax.set_xlabel(f'Departure Window (Days after UST:{m_2020["d_time0"]})')
-ax.set_ylabel(f'Arrival Window (Days after UST:{m_2020["a_time1"]})')
-fig.savefig(f'{PROJ_DIR}/video_output/{m_2020["out_title"]}.png')
-
+gen_porkchop_plot(m_2020, c3, vi)
 IND_DEP = 80
 IND_ARR = 60
 
@@ -50,10 +42,7 @@ departure_time = datetime.strptime(m_2020['d_time0'], "%Y-%m-%dT%H:%M:%S") + tim
 arrival_time = datetime.strptime(m_2020['a_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(iy)*m_2020['step'])
 
 
-#visual_animation(m_2020, departure_time, arrival_time, viq)
-
-#pr = perturbate_step(m_2020,departure_time, arrival_time, viq, np.linspace(-0.1,0.1,50))
-#pr_mod = np.linalg.norm(pr,axis=2)
+visual_animation(m_2020, departure_time, arrival_time, viq)
 
 plt.show()
 plt.close()

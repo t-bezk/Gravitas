@@ -21,34 +21,34 @@ m_2020 = {
     "out_title":    "Mars 2020 Transfer Window",
 }
 
-v_2020 = {
-    "d_time0":      "2021-04-01T00:00:00",
-    "d_time1":      "2022-12-01T00:00:00",
-    "a_time0":      "2021-01-01T00:00:00",
-    "a_time1":      "2023-01-01T00:00:00",
+MARINER_10_EV = {
+    "d_time0":      "1973-10-01T00:00:00",
+    "d_time1":      "1973-12-01T00:00:00",
+    "a_time0":      "1974-01-01T00:00:00",
+    "a_time1":      "1974-03-01T00:00:00",
 
-    "target":       "MARS BARYCENTER",
+    "target":       "VENUS BARYCENTER",
+    "origin":       "EARTH BARYCENTER",
+    "observer":     "SOLAR SYSTEM BARYCENTER",
+    "frame":        "ECLIPJ2000",
+    "abcorr":       "NONE",
+
+    "step":         3600*24,
+    "out_title":    "Mariner 10 Earth-Venus Window",
+}
+
+MARINER_10_VM = {
+    "d_time0":      "1974-01-01T00:00:00",
+    "d_time1":      "1974-03-01T00:00:00",
+    "a_time0":      "1974-03-10T00:00:00",
+    "a_time1":      "1974-05-01T00:00:00",
+
+    "target":       "MERCURY BARYCENTER",
     "origin":       "VENUS BARYCENTER",
     "observer":     "SOLAR SYSTEM BARYCENTER",
     "frame":        "ECLIPJ2000",
     "abcorr":       "NONE",
 
-    "step":         3600*12*5,
-    "out_title":    "Mars 2020",
-}
-
-e_2020 = {
-    "d_time0":      "2021-01-01T00:00:00",
-    "d_time1":      "2023-01-01T00:00:00",
-    "a_time0":      "2021-06-01T00:00:00",
-    "a_time1":      "2023-12-01T00:00:00",
-
-    "target":       "EARTH BARYCENTER",
-    "origin":       "MARS BARYCENTER",
-    "observer":     "SOLAR SYSTEM BARYCENTER",
-    "frame":        "ECLIPJ2000",
-    "abcorr":       "NONE",
-
-    "step":         3600*12*5,
-    "out_title":    "Mars 2020",
+    "step":         3600*24,
+    "out_title":    "Mariner 10 Venus-Mercury Window",
 }
