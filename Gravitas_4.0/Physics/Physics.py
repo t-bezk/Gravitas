@@ -7,11 +7,9 @@ by Tomas Bezkorowajnyj c. February 2025
 
 import numpy as np
 
-
 MU = 6.67e-11*1.989e30
 AU = 1.495979e11
 AUDAY = AU*1.1574e-5
-
 
 def update_vessel_physics(x_vec, v_vec, deltatime=3600):
     """timestep probe position about parent object
@@ -37,7 +35,6 @@ def update_vessel_physics(x_vec, v_vec, deltatime=3600):
 
     return np.concatenate([pos_0, vel_0])
 
-
 def update_planetary_physics(i, sp_obj,deltatime=3600):
     """timestep planetary position based on poliastro object profile
 
@@ -58,7 +55,3 @@ def update_planetary_physics(i, sp_obj,deltatime=3600):
     sp_obj[0][i] += vel_0[0] * deltatime / AU
     sp_obj[1][i] += vel_0[1] * deltatime / AU
     sp_obj[2][i] += vel_0[2] * deltatime / AU
-
-
-if __name__ == "__main__":
-    print("Physics.py successfully loaded")
