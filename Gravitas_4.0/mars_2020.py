@@ -11,7 +11,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from encounters import generate_porkchop, setup_kernel, destroy_kernel
 from spice_video import visual_animation
-from time_stepped import get_min
+from time_stepped import get_min, perturbate_step
 from dictionaries import m_2020
 
 ##  Retrieve local file directory
@@ -49,9 +49,15 @@ print(ix,iy)
 departure_time = datetime.strptime(m_2020['d_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(ix)*m_2020['step'])
 arrival_time = datetime.strptime(m_2020['a_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(iy)*m_2020['step'])
 
-visual_animation(m_2020, departure_time, arrival_time, viq)
+
+#visual_animation(m_2020, departure_time, arrival_time, viq)
+
+#pr = perturbate_step(m_2020,departure_time, arrival_time, viq, np.linspace(-0.1,0.1,50))
+#pr_mod = np.linalg.norm(pr,axis=2)
 
 plt.show()
 plt.close()
+
+plt.show()
 
 destroy_kernel()

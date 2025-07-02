@@ -17,7 +17,7 @@ m_2020 = {
     "frame":        "ECLIPJ2000",
     "abcorr":       "NONE",
 
-    "step":         3600*24,
+    "step":         3600*24*5,
     "out_title":    "Mars 2020 Transfer Window",
 }
 

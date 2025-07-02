@@ -9,8 +9,8 @@ import pathlib
 import matplotlib.pyplot as plt
 import matplotlib.animation as atn
 import encounters as en
-from Physics.physics import update_vessel_physics
 from Display.display_orbit import plot_trajectory
+from time_stepped import get_min_dist, timestepped_ephemeris
 
 ## pathlib directory
 PROJ_DIR = pathlib.Path(__file__).parent.resolve()
@@ -27,9 +27,9 @@ def visual_animation(dict_values, t_de, t_ar, velo):
     ## Get seperate time and position arrays from ephemeris data
     eph_tme,eph_trj_a = en.load_ephemeris_arrays(dict_values, t_de, t_ar,'target')
     _, eph_trj_b = en.load_ephemeris_arrays(dict_values, t_de, t_ar,'origin')
-    prb_eph = en.timestepped_ephemeris(dict_values,eph_trj_a,eph_trj_b,velo)
+    prb_eph = timestepped_ephemeris(dict_values,eph_trj_a,eph_trj_b,velo)
 
-    print(en.get_min_dist(dict_values,eph_trj_a,eph_trj_b,velo))
+    print(get_min_dist(dict_values,eph_trj_a,prb_eph,velo))
 
     ## Create a figure and axes
     fig, _ = plt.subplots(figsize=(10, 6))

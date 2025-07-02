@@ -11,7 +11,6 @@ import spiceypy as spice
 from poliastro.iod import izzo
 from poliastro.bodies import Sun
 from astropy import units as u
-from Physics.physics import update_vessel_physics
 
 ## project constants
 PROJ_DIR = pathlib.Path(__file__).parent.resolve()
@@ -54,17 +53,17 @@ def load_ephemeris_arrays(dict_values,d_t0,a_t0,bdy_tag):
     return ets, trj
 
 def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_rotations=0):
-    """_summary_
+    """Loop solving for all velocities within window
 
     Args:
-        trajectory_departure (_type_): _description_
-        trajectory_arrival (_type_): _description_
-        ets_de (_type_): _description_
-        ets_ar (_type_): _description_
-        no_rotations (int, optional): _description_. Defaults to 0.
+        trajectory_departure (tuple): _description_
+        trajectory_arrival (tuple): _description_
+        ets_de (tuple): _description_
+        ets_ar (tuple): _description_
+        no_rotations (int): _description_. Defaults to 0.
 
     Yields:
-        _type_: _description_
+        tuple: initial, arrival, origin, target
     """
     for i, _ in enumerate(trajectory_arrival):
         debug_message = f'Generating Layers: {100 * i / len(trajectory_arrival)}% complete'
@@ -117,36 +116,3 @@ def generate_porkchop(di,no_rotations=0):
     va_m = va_m.reshape(len(trj_ar), len(trj_de), 3)
 
     return v0_m, v1_m, vp_m, va_m
-
-def timestepped_ephemeris(dict_values,eph_trj_a,eph_trj_b,velo):
-    """_summary_
-
-    Args:
-        dict_values (_type_): _description_
-        t_de (_type_): _description_
-        t_ar (_type_): _description_
-        velo (_type_): _description_
-    """
-    ## generate transfer positions
-    prb_eph = np.zeros(shape=(len(eph_trj_a),6))
-    prb_eph[0] = np.concatenate([eph_trj_b[0][:3], velo])   ## :3
-    for q, _ in enumerate(prb_eph):
-        if q == 0:
-            continue
-        prb_eph[q] = update_vessel_physics(prb_eph[q-1][:3],prb_eph[q-1][3:], dict_values['step'])
-
-    return prb_eph
-
-def get_min_dist(dict_values,trj_a,trj_b,velo):
-    """_summary_
-
-    Args:
-        dict_values (_type_): _description_
-        trj_a (_type_): _description_
-        trj_b (_type_): _description_
-        velo (_type_): _description_
-    """
-    pos_vec = np.abs(timestepped_ephemeris(dict_values,trj_a,trj_b,velo)[:][:3] - trj_b[:][:3])
-    pos_mod = np.linalg.norm(pos_vec,axis=1)
-    min_ind = np.concatenate(np.where(pos_mod == np.min(pos_mod)))
-    return pos_vec[int(min_ind)]

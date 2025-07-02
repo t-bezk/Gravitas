@@ -53,11 +53,11 @@ In a new file, create a dictionary variable with the following indices.
 >     "frame":        "ECLIPJ2000",
 >     "abcorr":       "NONE",
 >  
->     "step":         3600*24,                         ## Time step in seconds
->     "out_title":    "Earth-Venus-Mars Transfer qq",  ## File name (for data or plots only)
+>     "step":         86400,                           ## Time step in seconds
+>     "out_title":    "Mars 2020 transfer window",     ## File name (for data or plots only)
 > }
 > ```
-These indices define the initial conditions and windows within which trajectories can be simulated. Difinitions for planet names can be found in the spiceypy documentation.
+These indices define the initial conditions and timeframes in which trajectories are to be simulated. Definitions for planet names can be found in the spiceypy documentation.
 
 Now call the function `generate_porkchop()` to generate an array of values for velocity. Note that the size of the arrays generated depend on the window size and the timestep. Smaller increments will take longer to generate, so a recommended step of 86400 seconds (one day) is default. The code below is from the file `mars_2020.py` and generates a contour plot of the c3 and v_departure magnitudes from different transfers.
 
