@@ -40,7 +40,7 @@ def update_planetary_physics(i, sp_obj,deltatime=3600):
 
     Args:
         i (int): object index
-        sp_obj (_type_): ephemeris data array [ pos, vel ]
+        sp_obj (tuple): ephemeris data array [ pos, vel ]
     """
     pos_0 = AU * np.array([sp_obj[0][i],sp_obj[1][i],sp_obj[2][i]])
     vel_0 = AUDAY * np.array([sp_obj[3][i],sp_obj[4][i],sp_obj[5][i]])

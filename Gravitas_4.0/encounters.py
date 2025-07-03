@@ -20,18 +20,17 @@ CLR = "\x1b[2K"
 
 
 def setup_kernel():
-    """Locate spice kernel data"""
+    """Locate spice kernel data in SP_DIR"""
     try:
         print(spice.tkvrsn('TOOLKIT'))
     except NotImplementedError as e:
         raise ValueError(f'Toolkit not found: {e}') from e
-
     ## Load SPICE kernels from file
     spice.furnsh(f"{PROJ_DIR}/{SP_DIR}/de421.bsp")
     spice.furnsh(f"{PROJ_DIR}/{SP_DIR}/naif0012.tls")
 
 def destroy_kernel():
-    """Clear kernel"""
+    """Clear kernel data after use"""
     spice.kclear()
 
 def get_ephemeris_time(lower_bond, upper_bound, time_step):
@@ -53,28 +52,19 @@ def load_ephemeris_arrays(dict_values,d_t0,a_t0,bdy_tag):
     return ets, trj
 
 def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_rotations=0):
-    """Loop solving for all velocities within window
-
-    Args:
-        trajectory_departure (tuple): _description_
-        trajectory_arrival (tuple): _description_
-        ets_de (tuple): _description_
-        ets_ar (tuple): _description_
-        no_rotations (int): _description_. Defaults to 0.
-
-    Yields:
-        tuple: initial, arrival, origin, target
+    """
+        Inputs a departure and arrival window and its corresponding time arrays
+        and outputs four vector arrays encoding the initial and final velocities determined
+        from the use of a Lambert's solver and the origin and target planet velocities.
     """
     for i, _ in enumerate(trajectory_arrival):
         debug_message = f'Generating Layers: {100 * i / len(trajectory_arrival)}% complete'
         print(debug_message)
         for j, _ in enumerate(trajectory_departure):
-            ##  Define velocity vectors
             v0 = 1e20*u.km/u.s
             v = 1e20*u.km/u.s
             if ets_ar[i] - ets_de[j] < 0:
                 continue    ## Ignore negative time
-
             ## Izzo Lambert Solver
             try:
                 lambert = izzo.lambert(
@@ -84,22 +74,15 @@ def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_r
                 v0, v = next(lambert)
             except ImportError:
                 v0, v = None, None
-
             yield v0, v, trajectory_departure[j][3:], trajectory_arrival[i][3:]
-
         print(CURSOR_UP + CLR, end="")
 
-
-
 def generate_porkchop(di,no_rotations=0):
-    """Solve for velocity values in 2d meshgrid format
-
-    Args:
-        di (_type_): dictionary values
-        no_rotations (int, optional): _description_. Defaults to 0.
-
-    Returns:
-        ndarray(4,N,3): velocity characteristics of simulation
+    """
+        vo, v1, vd, va = generate_porkchop(dictionary)
+        
+        Solve for velocity values in 2d meshgrid format and return
+        them as an array of four vectors.
     """
     try:
         ets_de, trj_de = load_ephemeris_arrays(di,di['d_time0'],di['d_time1'],'origin')

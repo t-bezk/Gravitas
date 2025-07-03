@@ -24,10 +24,10 @@ def vinfinity_match_3(dic_1, dic_2, v_ev, v_vm, t):
     ev_ets_de, _ = load_ephemeris_arrays(dic_1,dic_1['d_time0'],dic_1['d_time1'],'origin')
     vm_ets_ar, _ = load_ephemeris_arrays(dic_2,dic_2['a_time0'],dic_2['a_time1'],'target')
 
-    __vinf = np.zeros((len(ev_ets_de),len(vm_ets_ar)))
+    ev_vecs = v_ev[t][:len(ev_ets_de)]
+    vm_vecs = np.array([v_vm[ar][t] for ar in range(len(vm_ets_ar))])
 
-    for de, _ in enumerate(ev_ets_de):
-        for ar, _ in enumerate(vm_ets_ar):
-            __vinf[de][ar] = np.linalg.norm(v_ev[t][de]) - np.linalg.norm(v_vm[ar][t])
+    norms_ev = np.linalg.norm(ev_vecs, axis=1)[:, None]
+    norms_vm = np.linalg.norm(vm_vecs, axis=1)[None, :]
 
-    return __vinf
+    return norms_ev - norms_vm

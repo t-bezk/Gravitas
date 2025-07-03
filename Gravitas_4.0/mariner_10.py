@@ -14,7 +14,7 @@ from dictionaries import MARINER_10_EV, MARINER_10_VM
 
 ##  Retrieve local file directory
 PROJ_DIR = pathlib.Path(__file__).parent.resolve()
-MU = 6.67e-20*1.989e30
+MU = 6.67e-20*1.989e30  ## in km
 
 ## Transfer between planets as layed out in transfer definition
 setup_kernel()
@@ -35,8 +35,10 @@ r_pfb = (MU / np.linalg.norm(v_inf_ou[29][35])**2) * (-1 + 1 / np.sin(theta)) * 
 
 print(r_pfb)
 
-cont = plt.contour(vinf,levels=np.linspace(0,5,10))
-plt.clabel(cont, inline=1, fontsize=10)
+#cont = plt.contour(vinf,levels=np.linspace(0,5,10))
+#plt.clabel(cont, inline=1, fontsize=10)
+plt.imshow(vinf)
+plt.colorbar()
 
 plt.show()
 plt.close()
