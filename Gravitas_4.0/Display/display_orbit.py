@@ -62,6 +62,14 @@ def display_orbit(a,e,i,omega,Omega):
     ## Return 3d position components
     return np.array([x,y,z])
 
+def align_check(th_r, eps=1e-8):
+    """Checks alignment of angles"""
+    if np.linalg.norm(th_r) < 1e-8:
+        return 0
+    else:
+        th_m = np.arccos(th_r[0]/np.linalg.norm(th_r))
+        if th_r[1] < 0:
+            return 2*np.pi - th_m
 
 def plot_trajectory(V,R):
     """_summary_
@@ -81,6 +89,25 @@ def plot_trajectory(V,R):
     e_e = np.cross(V, H_e) / MU - R / R_mod
     n_e = np.cross([0,0,1], H_e)
     i_e = np.arccos(H_e[2]/H_e_mod)
+
+    if np.linalg.norm(n_e) < 1e-8:
+        W_e = 0
+    else:
+        W_e = np.arccos(n_e[0]/np.linalg.norm(n_e))
+        if n_e[1] < 0:
+            W_e = 2*np.pi - W_e
+
+    if np.linalg.norm(e_e) < 1e-8:
+        w_e = 0
+    elif np.linalg.norm(n_e) < 1e-8:
+        w_e = np.arccos(e_e[0]/np.linalg.norm(e_e))
+        if e_e[1] < 0:
+            w_e = 2*np.pi - w_e
+    else:
+        w_e = np.arccos(np.dot(n_e,e_e)/(np.linalg.norm(n_e)*np.linalg.norm(e_e)))
+        if e_e[2] < 0:
+            w_e = 2*np.pi - w_e
+
     W_e = np.arccos(n_e[0]/np.linalg.norm(n_e))
     w_e = np.arccos(np.dot(n_e,e_e)/(np.linalg.norm(n_e)*np.linalg.norm(e_e)))
     a_e = -MU/(2*E_e)

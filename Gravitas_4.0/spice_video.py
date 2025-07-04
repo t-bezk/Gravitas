@@ -50,7 +50,7 @@ def visual_animation(dict_values, t_de, t_ar, velo):
         ax.scatter(eph_trj_b[i][0], eph_trj_b[i][1], eph_trj_b[i][2])
         ax.plot(-orb_trj_b[0],-orb_trj_b[1],-orb_trj_b[2])
         ax.scatter(prb_eph[i][0],prb_eph[i][1],prb_eph[i][2])
-        ax.plot(-orb_prb[0],-orb_prb[1],orb_prb[2])
+        ax.plot(orb_prb[0],-orb_prb[1],-orb_prb[2])
 
     plt.grid(None)
 

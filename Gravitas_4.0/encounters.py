@@ -18,7 +18,6 @@ SP_DIR = 'Spice_Kernels'    ## Kernel dir
 CURSOR_UP = "\033[1A"
 CLR = "\x1b[2K"
 
-
 def setup_kernel():
     """Locate spice kernel data in SP_DIR"""
     try:
