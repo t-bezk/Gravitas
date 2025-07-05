@@ -28,14 +28,14 @@ c3 = np.linalg.norm(v0 - vp, axis=2)**2
 vi = np.linalg.norm(v1 - va, axis=2)
 
 ##  Generate figure
-#gen_porkchop_plot(m_2020, c3, vi)
+gen_porkchop_plot(m_2020, c3, vi)
 IND_DEP = 80
 IND_ARR = 60
 
-ix, iy = 15, 5
+iy, ix = get_min(vi)
 viq = v0[iy][ix]
 
-#print(np.min(vi))
+print(np.min(vi))
 print(ix,iy)
 
 departure_time = datetime.strptime(m_2020['d_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(ix)*m_2020['step'])

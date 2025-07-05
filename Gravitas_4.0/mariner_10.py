@@ -7,10 +7,12 @@ by Tomas Bezkorowajnyj c. July 2025
 
 import pathlib
 import numpy as np
+from datetime import datetime, timedelta
 from matplotlib import pyplot as plt
 from encounters import generate_porkchop, setup_kernel, destroy_kernel
 from vinf_matching import vinfinity_match_3
 from dictionaries import MARINER_10_EV, MARINER_10_VM
+from spice_video import visual_animation_3
 
 ##  Retrieve local file directory
 PROJ_DIR = pathlib.Path(__file__).parent.resolve()
@@ -35,13 +37,17 @@ r_pfb = (MU / np.linalg.norm(v_inf_ou[29][35])**2) * (-1 + 1 / np.sin(theta)) * 
 
 print(r_pfb)
 
-#cont = plt.contour(vinf,levels=np.linspace(0,5,10))
-#plt.clabel(cont, inline=1, fontsize=10)
-plt.imshow(vinf)
-plt.colorbar()
+#plt.imshow(vinf)
+#plt.colorbar()
+
+departure_time = datetime.strptime(MARINER_10_EV['d_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(35)*MARINER_10_EV['step'])
+arrival_time = datetime.strptime(MARINER_10_EV['a_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(35)*MARINER_10_EV['step'])
+
+
+visual_animation_3(MARINER_10_EV,MARINER_10_VM, departure_time, arrival_time, ev_v0[35][33], 35)
 
 plt.show()
 plt.close()
-plt.show()
+#plt.show()
 
 destroy_kernel()
