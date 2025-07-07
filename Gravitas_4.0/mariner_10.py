@@ -17,6 +17,7 @@ from spice_video import visual_animation_3
 ##  Retrieve local file directory
 PROJ_DIR = pathlib.Path(__file__).parent.resolve()
 MU = 6.67e-20*1.989e30  ## in km
+EPS = 0.5
 
 ## Transfer between planets as layed out in transfer definition
 setup_kernel()
@@ -28,26 +29,54 @@ ev_vi = np.linalg.norm(ev_v1 - ev_va, axis=2)
 vm_c3 = np.linalg.norm(vm_v0 - vm_vp, axis=2)**2
 vm_vi = np.linalg.norm(vm_v1 - vm_va, axis=2)
 
-vinf = vinfinity_match_3(MARINER_10_EV, MARINER_10_VM, ev_v1-ev_va, vm_v0-vm_vp, 35)
+vinf = []
+for _t in range(35):
+    vinf.append(vinfinity_match_3(MARINER_10_EV, MARINER_10_VM, ev_v1-ev_va, vm_v0-vm_vp, _t))
+vinf = np.array(vinf)
 
 v_inf_in = ev_v1-ev_va
-v_inf_ou = vm_v0-vm_vp
-theta = 0.5 * np.arccos( np.dot(v_inf_in[35][33],v_inf_ou[29][35]) / ( np.linalg.norm(v_inf_in[35][33]) * np.linalg.norm(v_inf_ou[30][35]) ) )
-r_pfb = (MU / np.linalg.norm(v_inf_ou[29][35])**2) * (-1 + 1 / np.sin(theta)) * 2E-6
+v_inf_ou = (vm_v0-vm_vp).transpose(1,0,2)
 
-print(r_pfb)
+i_gh = np.min([len(v_inf_in), len(v_inf_ou)])
+j_gh = np.min([len(v_inf_in[0]), len(v_inf_ou[0])])
 
-#plt.imshow(vinf)
-#plt.colorbar()
+print(v_inf_in.shape)
+print(v_inf_ou.shape)
+print(i_gh)
+print(j_gh)
+
+for _t in range(35):
+    R_pfb = np.zeros(shape=(i_gh,j_gh))
+
+    for i in range(i_gh):
+        for j in range(j_gh):
+            Theta = 0.5 * np.arccos( np.dot(v_inf_in[i][j],v_inf_ou[i][j]) / ( np.linalg.norm(v_inf_in[i][j]) * np.linalg.norm(v_inf_ou[i][j]) ) )
+            R_pfb[i][j] = (MU / np.linalg.norm(v_inf_ou[i][j])**2) * (-1 + 1 / np.sin(Theta)) * 2E-6
+
+    theta = 0.5 * np.arccos( np.dot(v_inf_in[35][33],v_inf_ou[29][35]) / ( np.linalg.norm(v_inf_in[35][33]) * np.linalg.norm(v_inf_ou[30][35]) ) )
+    r_pfb = (MU / np.linalg.norm(v_inf_ou[29][35])**2) * (-1 + 1 / np.sin(theta)) * 2E-6
+
+    print(r_pfb)
+
+
+
+    plt.imshow(R_pfb)
+    plt.colorbar()
+    plt.show()
 
 departure_time = datetime.strptime(MARINER_10_EV['d_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(35)*MARINER_10_EV['step'])
 arrival_time = datetime.strptime(MARINER_10_EV['a_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(35)*MARINER_10_EV['step'])
 
 
-visual_animation_3(MARINER_10_EV,MARINER_10_VM, departure_time, arrival_time, ev_v0[35][33], 35)
+#visual_animation_3(MARINER_10_EV,MARINER_10_VM, departure_time, arrival_time, ev_v0[35][33], 35)
 
 plt.show()
+
+plt.imshow(vinf)
+plt.colorbar()
+
+plt.show()
+
 plt.close()
-#plt.show()
 
 destroy_kernel()

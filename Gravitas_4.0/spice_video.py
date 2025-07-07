@@ -76,7 +76,7 @@ def visual_animation_3(d1, d2, t_de, t_ar, velo, t_tr):
     prb_eph_ev = timestepped_ephemeris(d1,eph_trj_a,eph_trj_b,velo)
     prb_eph_vm = timestepped_ephemeris(d2,eph_trj_a,eph_trj_b,velo)
 
-    prb_eph = np.concatenate(prb_eph_ev, prb_eph_vm)
+    prb_eph = np.append(prb_eph_ev, prb_eph_vm)
 
     #print(get_min_dist(dict_values,eph_trj_a,prb_eph,velo))
 
@@ -94,9 +94,9 @@ def visual_animation_3(d1, d2, t_de, t_ar, velo, t_tr):
         ax.set_xlim(-5e8, 5e8)
         ax.set_ylim(-5e8, 5e8)
         ax.set_zlim(-5e7, 5e7)
-        ax.scatter(eph_trj_a[i][0], eph_trj_a[i][1], eph_trj_a[i][2])
+        #ax.scatter(eph_trj_a[i][0], eph_trj_a[i][1], eph_trj_a[i][2])
         #ax.plot(-orb_trj_a[0],-orb_trj_a[1],-orb_trj_a[2])
-        ax.scatter(eph_trj_b[i][0], eph_trj_b[i][1], eph_trj_b[i][2])
+        #ax.scatter(eph_trj_b[i][0], eph_trj_b[i][1], eph_trj_b[i][2])
         #ax.plot(-orb_trj_b[0],-orb_trj_b[1],-orb_trj_b[2])
         ax.scatter(prb_eph[i][0],prb_eph[i][1],prb_eph[i][2])
         #ax.plot(orb_prb[0],-orb_prb[1],-orb_prb[2])
@@ -104,7 +104,7 @@ def visual_animation_3(d1, d2, t_de, t_ar, velo, t_tr):
     plt.grid(None)
 
     ## Creating a FuncAnimation object
-    ani = atn.FuncAnimation(fig, animate, interval=1, frames=range(len(eph_tme)))
+    ani = atn.FuncAnimation(fig, animate, interval=1, frames=range(len(prb_eph)))
 
     ## Save the animation as a GIF using the PillowWriter
     ani.save(f'{PROJ_DIR}/fig/animation.gif', writer='pillow')
