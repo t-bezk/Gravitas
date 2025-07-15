@@ -30,12 +30,11 @@ vm_c3 = np.linalg.norm(vm_v0 - vm_vp, axis=2)**2
 vm_vi = np.linalg.norm(vm_v1 - vm_va, axis=2)
 
 vinf = []
-for _t in range(35):
+for _t in range(36):
     vinf.append(vinfinity_match_3(MARINER_10_EV, MARINER_10_VM, ev_v1-ev_va, vm_v0-vm_vp, _t))
 vinf = np.array(vinf)
-
 v_inf_in = ev_v1-ev_va
-v_inf_ou = (vm_v0-vm_vp).transpose(1,0,2)
+v_inf_ou = vm_v0-vm_vp  #).transpose(1,0,2)
 
 i_gh = np.min([len(v_inf_in), len(v_inf_ou)])
 j_gh = np.min([len(v_inf_in[0]), len(v_inf_ou[0])])
@@ -45,24 +44,25 @@ print(v_inf_ou.shape)
 print(i_gh)
 print(j_gh)
 
-for _t in range(35):
-    R_pfb = np.zeros(shape=(i_gh,j_gh))
-
-    for i in range(i_gh):
-        for j in range(j_gh):
-            Theta = 0.5 * np.arccos( np.dot(v_inf_in[i][j],v_inf_ou[i][j]) / ( np.linalg.norm(v_inf_in[i][j]) * np.linalg.norm(v_inf_ou[i][j]) ) )
-            R_pfb[i][j] = (MU / np.linalg.norm(v_inf_ou[i][j])**2) * (-1 + 1 / np.sin(Theta)) * 2E-6
-
-    theta = 0.5 * np.arccos( np.dot(v_inf_in[35][33],v_inf_ou[29][35]) / ( np.linalg.norm(v_inf_in[35][33]) * np.linalg.norm(v_inf_ou[30][35]) ) )
-    r_pfb = (MU / np.linalg.norm(v_inf_ou[29][35])**2) * (-1 + 1 / np.sin(theta)) * 2E-6
-
-    print(r_pfb)
-
-
-
-    plt.imshow(R_pfb)
-    plt.colorbar()
-    plt.show()
+#for _t in range(35):
+#    R_pfb = np.zeros(shape=(i_gh,j_gh))
+#
+#    for i in range(i_gh):
+#        for j in range(j_gh):
+#            Theta = 0.5 * np.arccos( np.dot(v_inf_in[_t][j],v_inf_ou[i][_t]) / ( np.linalg.norm(v_inf_in[_t][j]) * np.linalg.norm(v_inf_ou[i][_t]) ) )
+#            R_pfb[i][j] = (MU / np.linalg.norm(v_inf_ou[i][_t])**2) * (-1 + 1 / np.sin(Theta)) * 2E-6
+#
+#    theta = 0.5 * np.arccos( np.dot(v_inf_in[_t][33],v_inf_ou[29][_t]) / ( np.linalg.norm(v_inf_in[_t][33]) * np.linalg.norm(v_inf_ou[30][_t]) ) )
+#    r_pfb = (MU / np.linalg.norm(v_inf_ou[29][_t])**2) * (-1 + 1 / np.sin(theta)) * 2E-6
+#
+#    print(r_pfb)
+#
+#
+#
+#    plt.imshow(R_pfb)
+#    plt.colorbar()
+#    plt.savefig(f'{PROJ_DIR}/fig/p{_t}.png')
+#    plt.close()
 
 departure_time = datetime.strptime(MARINER_10_EV['d_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(35)*MARINER_10_EV['step'])
 arrival_time = datetime.strptime(MARINER_10_EV['a_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(35)*MARINER_10_EV['step'])
@@ -72,11 +72,9 @@ arrival_time = datetime.strptime(MARINER_10_EV['a_time0'], "%Y-%m-%dT%H:%M:%S") 
 
 plt.show()
 
-plt.imshow(vinf)
-plt.colorbar()
-
-plt.show()
-
-plt.close()
+for _t in range(36):
+    plt.contour(vinf[_t],levels=[-5.,0.,5.])
+    plt.savefig(f'{PROJ_DIR}/fig/p{_t}.png')
+    plt.close()
 
 destroy_kernel()
