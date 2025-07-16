@@ -11,6 +11,31 @@ MU = 6.67e-11*1.989e30
 AU = 1.495979e11
 AUDAY = AU*1.1574e-5
 
+def rot_matrix(r_x, r_y, r_z, i, oomega, omega):
+    """Apply rotation to a vector in 3 dimentions"""
+
+    ##  Rotation matrix components (to transform the orbit to 3D space)
+    cos_oomega = np.cos(oomega)
+    sin_oomega = np.sin(oomega)
+    cos_omega = np.cos(omega)
+    sin_omega = np.sin(omega)
+    cos_i = np.cos(i)
+    sin_i = np.sin(i)
+
+    ##  Rotation matrix to convert from orbital plane to 3D space
+    r11 = cos_oomega * cos_omega - sin_oomega * sin_omega * cos_i
+    r12 = -cos_oomega * sin_omega - sin_oomega * cos_omega * cos_i
+    r13 = sin_oomega * sin_i
+    r21 = sin_oomega * cos_omega + cos_oomega * sin_omega * cos_i
+    r22 = -sin_oomega * sin_omega + cos_oomega * cos_omega * cos_i
+    r23 = -cos_oomega * sin_i
+    r31 = sin_omega * sin_i
+    r32 = cos_omega * sin_i
+    r33 = cos_i
+
+    ##  Apply the rotation matrix to each point in the orbital plane
+    return r11*r_x+r12*r_y+r13*r_z, r21*r_x+r22*r_y+r23*r_z, r31*r_x+r32*r_y+r33*r_z
+
 def display_orbit(a,e,i,omega,Omega):
     """generate a plottable trajectory path
 
@@ -61,15 +86,6 @@ def display_orbit(a,e,i,omega,Omega):
 
     ## Return 3d position components
     return np.array([x,y,z])
-
-def align_check(th_r, eps=1e-8):
-    """Checks alignment of angles"""
-    if np.linalg.norm(th_r) < 1e-8:
-        return 0
-    else:
-        th_m = np.arccos(th_r[0]/np.linalg.norm(th_r))
-        if th_r[1] < 0:
-            return 2*np.pi - th_m
 
 def plot_trajectory(V,R):
     """_summary_

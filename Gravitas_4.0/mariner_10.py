@@ -6,10 +6,11 @@ by Tomas Bezkorowajnyj c. July 2025
 """""""""""""""""""""""""""""""""
 
 import pathlib
-import numpy as np
 from datetime import datetime, timedelta
+import numpy as np
 from matplotlib import pyplot as plt
-from encounters import generate_porkchop, setup_kernel, destroy_kernel
+from encounters import generate_porkchop
+from kernel_handling import setup_kernel, destroy_kernel
 from vinf_matching import vinfinity_match_3
 from dictionaries import MARINER_10_EV, MARINER_10_VM
 from spice_video import visual_animation_3
@@ -25,6 +26,7 @@ T_INDEX = 60
 ## Transfer between planets as layed out in transfer definition
 
 def mariner_10():
+    """Locates transfer window that matches Mariner 10 mission trajectory"""
 
     ev_v0, ev_v1, ev_vp, ev_va  = generate_porkchop(MARINER_10_EV)
     vm_v0, vm_v1, vm_vp, vm_va  = generate_porkchop(MARINER_10_VM)

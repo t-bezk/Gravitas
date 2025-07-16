@@ -9,7 +9,7 @@ import pathlib
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as atn
-import encounters as en
+from kernel_handling import load_ephemeris_arrays
 from Display.display_orbit import plot_trajectory
 from time_stepped import get_min_dist, timestepped_ephemeris
 
@@ -26,8 +26,8 @@ def visual_animation(dict_values, t_de, t_ar, velo):
         velocity (string 3_): initial velocity of probe relative to sun on departure
     """
     ## Get seperate time and position arrays from ephemeris data
-    eph_tme,eph_trj_a = en.load_ephemeris_arrays(dict_values, t_de, t_ar,'target')
-    _, eph_trj_b = en.load_ephemeris_arrays(dict_values, t_de, t_ar,'origin')
+    eph_tme,eph_trj_a = load_ephemeris_arrays(dict_values, t_de, t_ar,'target')
+    _, eph_trj_b = load_ephemeris_arrays(dict_values, t_de, t_ar,'origin')
     prb_eph = timestepped_ephemeris(dict_values,eph_trj_a,eph_trj_b,velo)
 
     print(get_min_dist(dict_values,eph_trj_a,prb_eph,velo))
@@ -71,8 +71,8 @@ def visual_animation_3(d1, d2, t_de, t_ar, velo, t_tr):
         velocity (string 3_): initial velocity of probe relative to sun on departure
     """
     ## Get seperate time and position arrays from ephemeris data
-    eph_tme,eph_trj_a = en.load_ephemeris_arrays(d1, t_de, t_ar,'target')
-    _, eph_trj_b = en.load_ephemeris_arrays(d2, t_de, t_ar,'origin')
+    _, eph_trj_a = load_ephemeris_arrays(d1, t_de, t_ar,'target')
+    _, eph_trj_b = load_ephemeris_arrays(d2, t_de, t_ar,'origin')
     prb_eph_ev = timestepped_ephemeris(d1,eph_trj_a,eph_trj_b,velo)
     prb_eph_vm = timestepped_ephemeris(d2,eph_trj_a,eph_trj_b,velo)
 

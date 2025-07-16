@@ -5,50 +5,14 @@ by Tomas Bezkorowajnyj c. June 2025
 ----------------------------------
 """""""""""""""""""""""""""""""""
 
-import pathlib
 import numpy as np
-import spiceypy as spice
+from kernel_handling import load_ephemeris_arrays
 from poliastro.iod import izzo
 from poliastro.bodies import Sun
-from astropy import units as u
+from astropy.units import si as u
 
-## project constants
-PROJ_DIR = pathlib.Path(__file__).parent.resolve()
-SP_DIR = 'Spice_Kernels'    ## Kernel dir
 CURSOR_UP = "\033[1A"
 CLR = "\x1b[2K"
-
-def setup_kernel():
-    """Locate spice kernel data in SP_DIR"""
-    try:
-        print(spice.tkvrsn('TOOLKIT'))
-    except NotImplementedError as e:
-        raise ValueError(f'Toolkit not found: {e}') from e
-    ## Load SPICE kernels from file
-    spice.furnsh(f"{PROJ_DIR}/{SP_DIR}/de421.bsp")
-    spice.furnsh(f"{PROJ_DIR}/{SP_DIR}/naif0012.tls")
-
-def destroy_kernel():
-    """Clear kernel data after use"""
-    spice.kclear()
-
-def get_ephemeris_time(lower_bond, upper_bound, time_step):
-    """Convert to ephemeris time and return ordered array"""
-    eph0, eph1 = spice.str2et(lower_bond), spice.str2et(upper_bound)
-    return np.arange(eph0, eph1, time_step)
-
-def get_trajectory_data(origin, ets, frame, abcorr, observer):
-    """Get position data array from time array"""
-    return [spice.spkezr(origin, et, frame, abcorr, observer)[0] for et in ets]
-
-def load_ephemeris_arrays(dict_values,d_t0,a_t0,bdy_tag):
-    """Returns position and velocity arrays for both departure and arrival windows"""
-    __frame = dict_values["frame"]
-    __abcorr = dict_values["abcorr"]
-    __observer = dict_values["observer"]
-    ets = get_ephemeris_time(str(d_t0), str(a_t0), dict_values['step'])
-    trj = get_trajectory_data(dict_values[bdy_tag], ets, __frame, __abcorr, __observer)
-    return ets, trj
 
 def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_rotations=0):
     """
@@ -60,16 +24,17 @@ def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_r
         debug_message = f'Generating Layers: {100 * i / len(trajectory_arrival)}% complete'
         print(debug_message)
         for j, _ in enumerate(trajectory_departure):
-            v0 = 1e20*u.km/u.s
-            v = 1e20*u.km/u.s
+            v0 = 1e20 * u.km / u.s
+            v = 1e20 * u.km / u.s
             if ets_ar[i] - ets_de[j] < 0:
                 continue    ## Ignore negative time
+
             ## Izzo Lambert Solver
             try:
                 lambert = izzo.lambert(
-                    Sun.k, trajectory_departure[j][:3]*u.km,
-                    trajectory_arrival[i][:3]*u.km,
-                    ets_ar[i]*u.s - ets_de[j]*u.s,M=no_rotations) # :3
+                    Sun.k, trajectory_departure[j][:3] * u.km,
+                    trajectory_arrival[i][:3] * u.km,
+                    ets_ar[i] * u.s - ets_de[j] * u.s, M = no_rotations) # :3
                 v0, v = next(lambert)
             except ImportError:
                 v0, v = None, None
