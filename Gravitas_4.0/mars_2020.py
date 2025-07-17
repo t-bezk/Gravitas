@@ -32,7 +32,7 @@ def mars_2020():
     gen_porkchop_plot(M_2020, c3, vi)
 
     iy, ix = get_min(vi)
-    viq = v0[iy][ix]
+    vel_min = v0[iy][ix]
 
     print(np.min(vi))
     print(ix,iy)
@@ -42,7 +42,7 @@ def mars_2020():
     departure_time = datetime.strptime(M_2020['d_time0'], "%Y-%m-%dT%H:%M:%S") + t_delta_x
     arrival_time = datetime.strptime(M_2020['a_time0'], "%Y-%m-%dT%H:%M:%S") + t_delta_y
 
-    visual_animation(M_2020, departure_time, arrival_time, viq)
+    visual_animation(M_2020, departure_time, arrival_time, vel_min)
 
     plt.show()
     plt.close()

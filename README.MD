@@ -23,7 +23,7 @@ This is a developing passion project of mine which will be worked on alone and a
 
 - Develop N-body simulator and suitable regression system: So that you can take results from a Lambert's solver and use it in a real N-body simulation
 
-- V-infinity matching for simple encounters i.e., Mariner 10 mission Earth->Venus->Mercury
+~V-infinity matching for simple encounters i.e., Mariner 10 mission Earth->Venus->Mercury~
 
 - Test N-body solver for simple slingshot encounter missions
 
@@ -59,39 +59,41 @@ In a new file, create a dictionary variable with the following indices.
 > ```
 These indices define the initial conditions and timeframes in which trajectories are to be simulated. Definitions for planet names can be found in the spiceypy documentation.
 
-Now call the function `generate_porkchop()` to generate an array of values for velocity. Note that the size of the arrays generated depend on the window size and the timestep. Smaller increments will take longer to generate, so a recommended step of 86400 seconds (one day) is default. The code below is from the file `mars_2020.py` and generates a contour plot of the c3 and v_departure magnitudes from different transfers.
+Now call the function `generate_porkchop()` to generate an array of values for velocity. Note that the size of the arrays generated depend on the window size and the timestep. Smaller increments will take longer to generate, so a recommended step of 86400 seconds (one day) is default. To then display the associated porkshop plot graphically, use the display function `gen_porkshop_plot()` along with matplotlib. The code below is from the file `mars_2020.py` and generates a contour plot of the c3 and v_departure magnitudes from different transfers.
 
 > ```py
-> import pathlib
-> import numpy as np
-> from matplotlib import pyplot as plt
-> from encounter import generate_porkchop
-> from dictionaries import m_2020
+> import matplotlib.pyplot as plt
+> from dictionaries import M_2020
+> from encounters import generate_porkchop
+> from Display.figures import gen_porkchop_plot
+>
+> def mars_2020():
+>     """Generate porkchop plot and transfer profile for most optimum Mars-2020 trajectory"""
 > 
-> ##  Retrieve local file directory
-> PROJ_DIR = pathlib.Path(__file__).parent.resolve()
+>     v0, v1, vp, va  = generate_porkchop(M_2020)
 > 
-> ## Transfer between planets as layed out in transfer definition
-> v0, v1, vp, va  = generate_porkchop(m_2020)
+>     ##  Define meshgrids for contour plot
+>     c3 = np.linalg.norm(v0 - vp, axis=2)**2
+>     vi = np.linalg.norm(v1 - va, axis=2)
 > 
-> ##  Define meshgrids for contour plot
-> c3 = np.linalg.norm(v0 - vp, axis=2)**2
-> vi = np.linalg.norm(v1 - va, axis=2)
-> 
-> ##  Generate figure
-> fig, ax = plt.subplots(figsize=(10,12))
-> c3_contour = ax.contour(c3, levels=np.linspace(0,40,10), colors=[(0.0,0.0,1.0)])
-> vi_contour = ax.contour(vi, levels=np.linspace(0,4,10), colors=[(1.0,0.0,0.0)])
-> ax.clabel(c3_contour, inline=1, fontsize=10)
-> ax.clabel(vi_contour, inline=1, fontsize=10)
-> ax.set_title(f'{m_2020["out_title"]}')
-> ax.set_xlabel(f'Departure Window (Days after UST:{m_2020["d_time0"]})')
-> ax.set_ylabel(f'Arrival Window (Days after UST:{m_2020["a_time1"]})')
-> 
-> fig.savefig(f'{PROJ_DIR}/video_output/{m_2020["out_title"]}.png')
-> 
-> plt.show()
-> 
+>     ##  Generate figure
+>     gen_porkchop_plot(M_2020, c3, vi)
 > ```
 
+Finally, to run the code, a spice kernel has to be loaded in order to get the ephemeris data.
 
+> ```py
+> from kernel_handling import setup_kernel, destroy_kernel
+>
+> if __name__ == "__main__":
+> 
+>     setup_kernel()
+> 
+>     try:
+>         mars_2020()   ## mission code
+>     except Exception as e:
+>         print(f'error: \n{e}')
+>     finally:
+>         destroy_kernel()
+> ```
+>

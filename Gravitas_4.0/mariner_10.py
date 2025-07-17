@@ -38,28 +38,26 @@ def mariner_10():
     v_inf_ou = vm_v0-vm_vp
 
     vinf = []
-    for _t, _ in enumerate(v_inf_in):
+
+    i_gh = v_inf_in.shape[1]
+    j_gh = v_inf_ou.shape[0]
+    t_gh = v_inf_ou.shape[1]
+
+    for _t in range(t_gh):
         vinf.append(vinfinity_match_3(MARINER_10_EV, MARINER_10_VM, ev_v1-ev_va, vm_v0-vm_vp, _t))
     vinf = np.array(vinf)
 
-
-    i_gh = np.min([len(v_inf_in), len(v_inf_ou)])
-    j_gh = np.min([len(v_inf_in[0]), len(v_inf_ou[0])])
-
-    print(v_inf_in.shape)
-    print(v_inf_ou.shape)
-    print(i_gh)
-    print(j_gh)
-
     v_match = []
 
-    for _t, _ in enumerate(v_inf_in):
+    print(vinf.shape)
+
+    for _t in range(t_gh):
         for i in range(i_gh):
             for j in range(j_gh):
-                ab_dot = np.dot(v_inf_in[_t][j],v_inf_ou[i][_t])
-                ab_prod = np.linalg.norm(v_inf_in[_t][j]) * np.linalg.norm(v_inf_ou[i][_t])
+                ab_dot = np.dot(v_inf_in[_t][i],v_inf_ou[j][_t])
+                ab_prod = np.linalg.norm(v_inf_in[_t][i]) * np.linalg.norm(v_inf_ou[j][_t])
                 theta = 0.5 * np.arccos( ab_dot / ab_prod )
-                r_pfb = (MU / np.linalg.norm(v_inf_ou[i][_t])**2) * (-1 + 1 / np.sin(theta)) * 2E-6
+                r_pfb = (MU / np.linalg.norm(v_inf_ou[j][_t])**2) * (-1 + 1 / np.sin(theta)) * 2E-6
                 vi = np.sqrt(ev_c3[_t][j])
 
                 if np.abs(vinf[_t][i][j]) < EPS and 6052. < r_pfb < 50000.:
@@ -70,9 +68,9 @@ def mariner_10():
     v_inf_match = []
 
     for r in v_match:
-        e_imp = datetime.strptime(MARINER_10_EV['d_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(r[0])*MARINER_10_EV['step'])
+        e_imp = datetime.strptime(MARINER_10_EV['d_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(r[1])*MARINER_10_EV['step'])
         v_imp = datetime.strptime(MARINER_10_EV['a_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(r[2])*MARINER_10_EV['step'])
-        m_imp = datetime.strptime(MARINER_10_VM['a_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(r[1])*MARINER_10_EV['step'])
+        m_imp = datetime.strptime(MARINER_10_VM['a_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(r[0])*MARINER_10_EV['step'])
         v_inf_match.append([str(e_imp), str(v_imp), str(m_imp), int(r[3]), float(r[4])])
 
     for r in v_inf_match:
@@ -82,7 +80,6 @@ def mariner_10():
 if __name__ == "__main__":
 
     setup_kernel()
-
     try:
         mariner_10()
     except Exception as e:
