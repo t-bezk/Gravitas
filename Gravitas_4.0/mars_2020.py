@@ -38,7 +38,7 @@ def mars_2020():
     print(ix,iy)
 
     t_delta_x = timedelta(seconds=float(ix)*M_2020['step'])
-    t_delta_y = timedelta(seconds=float(iy)*M_2020['step']) 
+    t_delta_y = timedelta(seconds=float(iy)*M_2020['step'])
     departure_time = datetime.strptime(M_2020['d_time0'], "%Y-%m-%dT%H:%M:%S") + t_delta_x
     arrival_time = datetime.strptime(M_2020['a_time0'], "%Y-%m-%dT%H:%M:%S") + t_delta_y
 
@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     try:
         mars_2020()
-    except Exception as e:
+    except IndexError as e:
         print(f'error: \n{e}')
     finally:
         destroy_kernel()

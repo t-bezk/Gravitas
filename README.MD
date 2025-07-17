@@ -11,9 +11,9 @@
 
 ===================
 
-Gravitas is a python-based simulator which can predict dynamic paths between planets. It utilises spice kernel data to locate gravitational slingshot trajectories between planets within the solar system using a Lambert's solver and v-infinity matching.
+Gravitas is a python-based simulator which can predict chains of slingshot trajectories between planets in the solar system using a Lambert's solver and v-infinity matching.
 
-This is a developing passion project of mine which will be worked on alone and aims to be completed by the end of the summer.
+This is a developing passion project of mine which will be worked on alone and aims to be completed by the end of summer 2025.
 
 ===================
 
@@ -33,6 +33,8 @@ This is a developing passion project of mine which will be worked on alone and a
 ### Updates since v.3.0
 
 Clutter files from previous installments have been removed.
+
+v-infinity matching implemented on meshgrid data without regression. This will need to be improved later on.
 
 ### Boilerplates
 
@@ -61,6 +63,8 @@ These indices define the initial conditions and timeframes in which trajectories
 
 Now call the function `generate_porkchop()` to generate an array of values for velocity. Note that the size of the arrays generated depend on the window size and the timestep. Smaller increments will take longer to generate, so a recommended step of 86400 seconds (one day) is default. To then display the associated porkshop plot graphically, use the display function `gen_porkshop_plot()` along with matplotlib. The code below is from the file `mars_2020.py` and generates a contour plot of the c3 and v_departure magnitudes from different transfers.
 
+With a correctly defined dictionary, generate velocity arrays and then calculate arrival velocity and c3 meshgrids for each configuration like so.
+
 > ```py
 > import matplotlib.pyplot as plt
 > from dictionaries import M_2020
@@ -68,32 +72,36 @@ Now call the function `generate_porkchop()` to generate an array of values for v
 > from Display.figures import gen_porkchop_plot
 >
 > def mars_2020():
->     """Generate porkchop plot and transfer profile for most optimum Mars-2020 trajectory"""
-> 
->     v0, v1, vp, va  = generate_porkchop(M_2020)
-> 
->     ##  Define meshgrids for contour plot
->     c3 = np.linalg.norm(v0 - vp, axis=2)**2
->     vi = np.linalg.norm(v1 - va, axis=2)
-> 
->     ##  Generate figure
->     gen_porkchop_plot(M_2020, c3, vi)
+>   
+>   ## Solve for velocities using packaged Lambert's solver
+>   v0, v1, vp, va  = generate_porkchop(M_2020)
+>   
+>   ##  Define meshgrids for contour plot
+>   c3 = np.linalg.norm(v0 - vp, axis=2)**2
+>   v2 = np.linalg.norm(v1 - va, axis=2)
+>   
+>   ##  Generate figure
+>   gen_porkchop_plot(M_2020, c3, v2)
 > ```
 
-Finally, to run the code, a spice kernel has to be loaded in order to get the ephemeris data.
+Finally, to run the code, a spice kernel has to be loaded in order to get the ephemeris data. The following code allows for safe data handling in case of an error in the function.
 
 > ```py
 > from kernel_handling import setup_kernel, destroy_kernel
 >
 > if __name__ == "__main__":
 > 
->     setup_kernel()
+>     setup_kernel()    ## Load kernel
 > 
->     try:
->         mars_2020()   ## mission code
+>     try:  ## mission code
+>         mars_2020()
 >     except Exception as e:
 >         print(f'error: \n{e}')
->     finally:
+>     finally:  ## Destroy kernel after use prevents data leaks
 >         destroy_kernel()
 > ```
 >
+
+*v-infinity matching*
+
+For a transfer between three or more bodies,

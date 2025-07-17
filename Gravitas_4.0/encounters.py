@@ -13,6 +13,7 @@ from astropy.units import si as u
 
 CURSOR_UP = "\033[1A"
 CLR = "\x1b[2K"
+MU = 6.67e-20*1.989e30  ## in km
 
 def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_rotations=0):
     """
@@ -63,3 +64,10 @@ def generate_porkchop(di,no_rotations=0):
     va_m = va_m.reshape(len(trj_ar), len(trj_de), 3)
 
     return v0_m, v1_m, vp_m, va_m
+
+def get_periapsis(v_inf_in, v_inf_ou):
+    """Returns closest approach distance based on relative approach and departure velocities"""
+    ab_dot = np.dot(v_inf_in,v_inf_ou)
+    ab_prod = np.linalg.norm(v_inf_in) * np.linalg.norm(v_inf_ou)
+    theta = 0.5 * np.arccos( ab_dot / ab_prod )
+    return (MU / np.linalg.norm(v_inf_ou)**2) * (-1 + 1 / np.sin(theta)) * 2E-6
