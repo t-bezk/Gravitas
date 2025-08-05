@@ -13,7 +13,7 @@
 
 Gravitas is a python-based simulator which can predict chains of slingshot trajectories between planets in the solar system using a Lambert's solver and v-infinity matching.
 
-This is a developing passion project of mine which will be worked on alone and aims to be completed by the end of summer 2025.
+This is a developing passion project of mine which will be worked on alone and aims to be completed by the end of summer 2025. The main goal for the program is to have it able to continously run and look for trajectories without intervention.
 
 ===================
 
@@ -27,8 +27,7 @@ This is a developing passion project of mine which will be worked on alone and a
 
 - Test N-body solver for simple slingshot encounter missions
 
-- Dismantle Izzo's algorithm and understand it from first principles, load spice kernel data into C and then implement Izzo into C. Potential future in compiled language for faster speed
-
+- Dismantle Izzo's algorithm and understand it from first principles, load spice kernel data into C and then implement Izzo into C. Utilise Ctypes and JIT compilers to reduce computation times.
 
 ### Updates since v.3.0
 

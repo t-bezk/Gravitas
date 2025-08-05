@@ -52,3 +52,22 @@ MARINER_10_VM = {
     "step":         3600*24,
     "out_title":    "Mariner 10 Venus-Mercury Window",
 }
+
+META_EVM = {
+    "d_time0":      "1970-01-01T00:00:00",
+    "d_time1":      "2000-01-01T00:00:00",
+    "tof_max":      3600*24*700,
+
+    "bodies":       [   
+                    "EARTH BARYCENTER",
+                    "VENUS BARYCENTER",
+                    "MERCURY BARYCENTER"
+                    ],
+
+    "observer":     "SOLAR SYSTEM BARYCENTER",
+    "frame":        "ECLIPJ2000",
+    "abcorr":       "NONE",
+
+    "step":         3600*24,
+    "out_title":    "Mariner 10 Venus-Mercury Window",
+}

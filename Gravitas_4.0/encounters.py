@@ -48,6 +48,8 @@ def generate_porkchop(di,no_rotations=0):
         
         Solve for velocity values in 2d meshgrid format and return
         them as an array of four vectors.
+
+
     """
     try:
         ets_de, trj_de = load_ephemeris_arrays(di,di['d_time0'],di['d_time1'],'origin')
@@ -71,3 +73,7 @@ def get_periapsis(v_inf_in, v_inf_ou):
     ab_prod = np.linalg.norm(v_inf_in) * np.linalg.norm(v_inf_ou)
     theta = 0.5 * np.arccos( ab_dot / ab_prod )
     return (MU / np.linalg.norm(v_inf_ou)**2) * (-1 + 1 / np.sin(theta)) * 2E-6
+
+def get_orbital_period(r):
+    """Returns orbital period from radial distance"""
+    return ( 4 * np.pi**2 / MU * np.linalg.norm(r)**3 ) ** 0.5

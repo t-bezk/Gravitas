@@ -1,6 +1,6 @@
 """""""""""""""""""""""""""""""""
 ----------------------------------
-GRAVITAS v.4.0.1 - Mariner 10 demo
+GRAVITAS v.4.0.1 - three body demo
 by Tomas Bezkorowajnyj c. July 2025
 ----------------------------------
 """""""""""""""""""""""""""""""""
@@ -12,6 +12,7 @@ from encounters import generate_porkchop, get_periapsis
 from kernel_handling import setup_kernel, destroy_kernel
 from vinf_matching import vinfinity_match_3
 from dictionaries import MARINER_10_EV, MARINER_10_VM
+#from spice_video import visual_animation_3
 
 ##  Retrieve local file directory
 PROJ_DIR = pathlib.Path(__file__).parent.resolve()
@@ -26,12 +27,11 @@ def mariner_10():
 
     ev_c3 = np.linalg.norm(ev_v0 - ev_vp, axis=2)**2
 
-    v_inf_in = ev_v1 - ev_va
-    v_inf_ou = vm_v0 - vm_vp
-
+    v_inf_in = ev_v1-ev_va
+    v_inf_ou = vm_v0-vm_vp
     vinf = []
     for _t in range(v_inf_ou.shape[1]):
-        vinf.append(vinfinity_match_3(MARINER_10_EV, MARINER_10_VM, ev_v1-ev_va,vm_v0-vm_vp,_t))
+        vinf.append(vinfinity_match_3(MARINER_10_EV, MARINER_10_VM, ev_v1-ev_va, vm_v0-vm_vp, _t))
     vinf = np.array(vinf)
 
     v_match = []
@@ -61,6 +61,8 @@ if __name__ == "__main__":
     setup_kernel()
     try:
         mariner_10()
+    except KeyboardInterrupt as e:
+        print(f'error: \n{e}')
     except IndexError as e:
         print(f'error: \n{e}')
     finally:
