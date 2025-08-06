@@ -13,10 +13,12 @@ from kernel_handling import setup_kernel, destroy_kernel
 from vinf_matching import vinfinity_match_3
 from dictionaries import MARINER_10_EV, MARINER_10_VM
 
+
 ##  Retrieve local file directory
 PROJ_DIR = pathlib.Path(__file__).parent.resolve()
 EPS = 0.01
 CLOSEST_APPROACH = 1.182e4
+
 
 def mariner_10():
     """Locates transfer window that matches Mariner 10 mission trajectory"""
