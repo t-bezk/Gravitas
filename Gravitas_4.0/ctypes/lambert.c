@@ -24,6 +24,11 @@ double hyp2f1b(double x) {
 }
 
 
+double _compute_y(double x, double ll)  {
+    return sqrt(1. - ll * ll * (1. - x * x));
+}
+
+
 double _compute_psi(double x, double y, double ll)   {
 
     if (-1. <= x < 1.)
@@ -35,22 +40,37 @@ double _compute_psi(double x, double y, double ll)   {
 }
 
 
-double _tof_equation(double x, double y, double T0, double ll, short M)    {
+double _tof_equation(double x, double y, double T0, double ll, int M) {
 
     double T_;
-    if (M == 0 && sqrt(0.6) < x && x < sqrt(1.4))   {
+    if (M == 0 && sqrt(0.6) < x && x < sqrt(1.4)) {
         double eta = y - ll * x;
         double hS_1 = hyp2f1b((1. - ll - x * eta) * .5);
-        double Q = 2 * f23 * hS_1;
-        T_ = (eta * eta * eta * Q + 4 * ll * eta) * .5;
+        double Q = 2. * f23 * hS_1;
+        T_ = (eta * eta * eta * Q + 4. * ll * eta) * .5;
     }
-    else    {
+    else {
         double psi = _compute_psi(x, y, ll);
-        T_ = 0.;
+        T_ = (((psi + PI * M) / sqrt(fabs(1. - x * x))) - x + ll * y) / (1. - x * x);
     }
-
     return T_ - T0;
 }
+
+
+double _tof_equation_p(double x, double y, double T, double ll) {
+    //TODO: What about derivatives when x approaches 1?
+    return (3. * T * x - 2. + 2. * pow(ll, 3.) * x / y) / (1 - x * x);
+}
+
+double _tof_equation_p2(double x, double y, double T, double dT, double ll) {
+    return (3 * T + 5 * x * dT + 2 * (1 - ll * ll) * pow(ll, 3) / pow(y, 3)) / (1 - x * x);
+}
+
+double _tof_equation_p3(double x, double y, double _, double dT, double ddT, double ll) {
+    return (7 * x * ddT + 8 * dT - 6 * (1 - ll * ll) * pow(ll, 5) * x / pow(y, 5)) / (1 - x * x);
+}
+
+
 
 
 double _initial_guess(double T, double ll, short M)    {
@@ -69,18 +89,52 @@ double _initial_guess(double T, double ll, short M)    {
     return x_0;
 }
 
-double _tof_equation_p(double x, double y, double T, double ll) {
-    //TODO: What about derivatives when x approaches 1?
-    return (3. * T * x - 2. + 2. * pow(ll, 3.) * x / y) / (1 - x * x);
+double _halley(double p0, double T0, double ll, double tol, int maxiter)  {
+
+    for (int _ = 0; _ < maxiter; _++)   {
+        double y = _compute_y(p0, ll);
+        double fder = _tof_equation_p(p0, y, T0, ll);
+        double fder2 = _tof_equation_p2(p0, y, T0, fder, ll);
+        if (fder == 0)
+            return INFINITY;
+        double fder3 = _tof_equation_p3(p0, y, T0, fder, fder2, ll);
+
+        // Halley Cubic Step
+        double p = p0 - 2. * fder * fder2 / (2. * fder2 * fder2 - fder * fder3);
+        
+        if (abs(p - p0) < tol)
+            return p;
+        p0 = p;
+    }
+    return INFINITY;
 }
 
-double _tof_equation_p2(double x, double y, double T, double dT, double ll) {
-    return (3 * T + 5 * x * dT + 2 * (1 - ll * ll) * pow(ll, 3) / pow(y, 3)) / (1 - x * x);
+
+
+double _householder(double p0, double T0, double ll, int M, double tol, int maxiter) {
+
+    for (int _ = 0; _ < maxiter; _++) {
+        double y = _compute_y(p0, ll);
+        double fval = _tof_equation(p0, y, T0, ll, M);
+        double T = fval + T0;
+
+        double fder = _tof_equation_p(p0, y, T, ll);
+        double fder2 = _tof_equation_p2(p0, y, T, fder, ll);
+        double fder3 = _tof_equation_p3(p0, y, T, fder, fder2, ll);
+
+        // Househoolder Quartic Step
+        double p = p0 - fval * (fder * fder - fval * fder2 * 0.5) /
+            (fder * (fder * fder - fval * fder2) + fder3 * fval * fval / 6);
+
+        if (abs(p - p0) < tol)
+            return p;
+        
+        p0 = p;
+    }
+    return -1;
 }
 
-double _tof_equation_p3(double x, double y, double _, double dT, double ddT, double ll) {
-    return (7 * x * ddT + 8 * dT - 6 * (1 - ll * ll) * pow(ll, 5) * x / pow(y, 5)) / (1 - x * x);
-}
+
 
 int main(){
 
