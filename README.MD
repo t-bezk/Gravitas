@@ -1,6 +1,6 @@
 # Gravitas v.4.0.1 - Gravity Assist Simulator
 
-*Made by: Tomas Bezkorowajnyj 2025*
+*Made by: Attempt 4 2025*
 
 *Github: @Attempt4*
 

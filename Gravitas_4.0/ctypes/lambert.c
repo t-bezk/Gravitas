@@ -111,7 +111,7 @@ double _halley(double p0, double T0, double ll, double tol, int maxiter)  {
 
 
 
-double _householder(double p0, double T0, double ll, int M, double tol, int maxiter) {
+double householder(double p0, double T0, double ll, int M, double tol, int maxiter) {
 
     for (int _ = 0; _ < maxiter; _++) {
         double y = _compute_y(p0, ll);
@@ -136,11 +136,11 @@ double _householder(double p0, double T0, double ll, int M, double tol, int maxi
 
 
 
-int main(){
-
-    double val = _initial_guess(200., 0.5, 0);
-
-    printf("%f", val);
-
-    return 0;
-}
+//int main(){
+//
+//    double val = _initial_guess(200., 0.5, 0);
+//
+//    printf("%f", val);
+//
+//    return 0;
+//}
