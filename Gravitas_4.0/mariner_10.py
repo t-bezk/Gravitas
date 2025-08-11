@@ -12,6 +12,7 @@ from encounters import generate_porkchop, get_periapsis
 from kernel_handling import setup_kernel, destroy_kernel
 from vinf_matching import vinfinity_match_3
 from dictionaries import MARINER_10_EV, MARINER_10_VM
+from spice_video import visual_animation_3
 
 
 ##  Retrieve local file directory
@@ -37,6 +38,7 @@ def mariner_10():
     vinf = np.array(vinf)
 
     v_match = []
+    v_0_col = []
 
     for _t in range(v_inf_ou.shape[1]):
         for i in range(v_inf_in.shape[1]):
@@ -44,6 +46,7 @@ def mariner_10():
                 r_pfb = get_periapsis(v_inf_in[_t][i], v_inf_ou[j][_t])
                 if np.abs(vinf[_t][i][j]) < EPS and 6052. < r_pfb < 50000.:
                     v_match.append([j, i, _t, r_pfb, np.sqrt(ev_c3[_t][j])])
+                    v_0_col.append([ev_v0[_t][i]-ev_vp[_t][i], vm_v0[j][_t]-vm_vp[j][_t]])
 
     v_match = np.array(v_match)
 
@@ -55,8 +58,11 @@ def mariner_10():
         m_imp = datetime.strptime(MARINER_10_VM['a_time0'], "%Y-%m-%dT%H:%M:%S") + timedelta(seconds=float(r[0])*MARINER_10_EV['step'])
         v_inf_match.append([str(e_imp), str(v_imp), str(m_imp), int(r[3]), float(r[4])])
 
-    for r in v_inf_match:
+    visual_animation_3(MARINER_10_EV, MARINER_10_VM, v_inf_match[0][0], v_inf_match[0][2], v_0_col[0], v_inf_match[0][1])
+
+    for i, r in enumerate(v_inf_match):
         print(r)
+        print(f'{np.linalg.norm(v_0_col[i][0],axis=0)}, {np.linalg.norm(v_0_col[i][1],axis=0)}')
 
 if __name__ == "__main__":
 

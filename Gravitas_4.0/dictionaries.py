@@ -33,7 +33,7 @@ MARINER_10_EV = {
     "frame":        "ECLIPJ2000",
     "abcorr":       "NONE",
 
-    "step":         3600*24,
+    "step":         3600*4,
     "out_title":    "Mariner 10 Earth-Venus Window",
 }
 
@@ -49,7 +49,7 @@ MARINER_10_VM = {
     "frame":        "ECLIPJ2000",
     "abcorr":       "NONE",
 
-    "step":         3600*24,
+    "step":         3600*4,
     "out_title":    "Mariner 10 Venus-Mercury Window",
 }
 

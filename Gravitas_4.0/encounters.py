@@ -23,6 +23,7 @@ def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_r
     """
     for i, _ in enumerate(trajectory_arrival):
         debug_message = f'Generating Layers: {100 * i / len(trajectory_arrival)}% complete'
+        print(CURSOR_UP + CLR, end="")
         print(debug_message)
         for j, _ in enumerate(trajectory_departure):
             v0 = 1e20 * u.km / u.s
@@ -40,7 +41,6 @@ def lambert_solve(trajectory_departure, trajectory_arrival, ets_de, ets_ar, no_r
             except ImportError:
                 v0, v = None, None
             yield v0, v, trajectory_departure[j][3:], trajectory_arrival[i][3:]
-        print(CURSOR_UP + CLR, end="")
 
 def generate_porkchop(di,no_rotations=0):
     """

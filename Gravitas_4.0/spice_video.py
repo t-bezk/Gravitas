@@ -71,40 +71,59 @@ def visual_animation_3(d1, d2, t_de, t_ar, velo, t_tr):
         velocity (string 3_): initial velocity of probe relative to sun on departure
     """
     ## Get seperate time and position arrays from ephemeris data
-    _, eph_trj_a = load_ephemeris_arrays(d1, t_de, t_ar,'target')
+    _, eph_trj_a = load_ephemeris_arrays(d1, t_de, t_ar,'origin')
     _, eph_trj_b = load_ephemeris_arrays(d2, t_de, t_ar,'origin')
-    prb_eph_ev = timestepped_ephemeris(d1,eph_trj_a,eph_trj_b,velo)
-    prb_eph_vm = timestepped_ephemeris(d2,eph_trj_a,eph_trj_b,velo)
+    _, eph_trj_c = load_ephemeris_arrays(d2, t_de, t_ar,'target')
 
-    prb_eph = np.append(prb_eph_ev, prb_eph_vm)
+    _, eph_tr_1 = load_ephemeris_arrays(d1, t_de, t_tr,'origin')
+    _, eph_tr_2 = load_ephemeris_arrays(d2, t_tr, t_ar,'origin')
+
+    prb_eph_ev = timestepped_ephemeris(d1,eph_tr_1,eph_tr_1,velo[0])
+    prb_eph_vm = timestepped_ephemeris(d2,eph_tr_2,prb_eph_ev,velo[1])
+
+    prb_eph = np.concatenate([prb_eph_ev, prb_eph_vm])
+
+    print(len(prb_eph))
+    print(len(prb_eph_ev))
+    print(len(prb_eph_vm))
+    print(len(eph_trj_a))
+
 
     #print(get_min_dist(dict_values,eph_trj_a,prb_eph,velo))
 
     ## Create a figure and axes
     fig, _ = plt.subplots(figsize=(10, 6))
 
-    #orb_trj_a = plot_trajectory(eph_trj_a[0][3:]*1e3,eph_trj_a[0][:3]*1e3) * 1e-3
-    #orb_trj_b = plot_trajectory(eph_trj_b[0][3:]*1e3,eph_trj_b[0][:3]*1e3) * 1e-3
+    orb_trj_a = plot_trajectory(eph_trj_a[0][3:]*1e3,eph_trj_a[0][:3]*1e3) * 1e-3
+    orb_trj_b = plot_trajectory(eph_trj_b[0][3:]*1e3,eph_trj_b[0][:3]*1e3) * 1e-3
+    orb_trj_c = plot_trajectory(eph_trj_c[0][3:]*1e3,eph_trj_c[0][:3]*1e3) * 1e-3
     #orb_prb = plot_trajectory(prb_eph[0][3:]*1e3,prb_eph[0][:3]*1e3) * 1e-3
 
+    MULT = 6
+
     ## Function to update the plot for each frame of the animation
-    def animate(i):
+    def animate(r):
+        i = MULT*r
         fig.clear()
         ax = fig.add_subplot(projection='3d')
         ax.set_xlim(-5e8, 5e8)
         ax.set_ylim(-5e8, 5e8)
         ax.set_zlim(-5e7, 5e7)
-        #ax.scatter(eph_trj_a[i][0], eph_trj_a[i][1], eph_trj_a[i][2])
-        #ax.plot(-orb_trj_a[0],-orb_trj_a[1],-orb_trj_a[2])
-        #ax.scatter(eph_trj_b[i][0], eph_trj_b[i][1], eph_trj_b[i][2])
-        #ax.plot(-orb_trj_b[0],-orb_trj_b[1],-orb_trj_b[2])
+        ax.scatter(eph_trj_a[i][0], eph_trj_a[i][1], eph_trj_a[i][2])
+        ax.plot(-orb_trj_a[0],-orb_trj_a[1],-orb_trj_a[2])
+        ax.scatter(eph_trj_b[i][0], eph_trj_b[i][1], eph_trj_b[i][2])
+        ax.plot(-orb_trj_b[0],-orb_trj_b[1],-orb_trj_b[2])
+        ax.scatter(eph_trj_c[i][0],eph_trj_c[i][1],eph_trj_c[i][2])
+        ax.plot(-orb_trj_c[0],-orb_trj_c[1],-orb_trj_c[2])
         ax.scatter(prb_eph[i][0],prb_eph[i][1],prb_eph[i][2])
         #ax.plot(orb_prb[0],-orb_prb[1],-orb_prb[2])
 
     plt.grid(None)
 
     ## Creating a FuncAnimation object
-    ani = atn.FuncAnimation(fig, animate, interval=1, frames=range(len(prb_eph)))
+    ani = atn.FuncAnimation(fig, animate, interval=1, frames=range(int(len(eph_trj_a)/MULT)))
 
     ## Save the animation as a GIF using the PillowWriter
     ani.save(f'{PROJ_DIR}/fig/animation.gif', writer='pillow')
+    
+    plt.close()
