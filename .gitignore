@@ -3,6 +3,10 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Media output directories
+Gravitas_4.0/video_output/
+
+
 # User-specific files
 *.rsuser
 *.suo

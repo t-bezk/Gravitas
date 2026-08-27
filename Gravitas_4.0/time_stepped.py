@@ -6,7 +6,7 @@ by Tomas Bezkorowajnyj c. June 2025
 """""""""""""""""""""""""""""""""
 
 import numpy as np
-from Physics.physics import update_vessel_physics
+from Physics.Physics import update_vessel_physics
 from encounters import load_ephemeris_arrays
 
 def get_min(arr) -> tuple[float,float]:
