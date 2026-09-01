@@ -1,7 +1,7 @@
 """""""""""""""""""""""""""""""""
 ----------------------------------
 GRAVITAS v.4.0.1 - mars2020 demo
-by Tomas Bezkorowajnyj c. June 2025
+by Tomas Bezkorowajnyj c. June 2026
 ----------------------------------
 """""""""""""""""""""""""""""""""
 
@@ -42,7 +42,7 @@ def mars_2020():
     departure_time = datetime.strptime(M_2020['d_time0'], "%Y-%m-%dT%H:%M:%S") + t_delta_x
     arrival_time = datetime.strptime(M_2020['a_time0'], "%Y-%m-%dT%H:%M:%S") + t_delta_y
 
-    visual_animation(M_2020, departure_time, arrival_time, vel_min)
+    ## visual_animation(M_2020, departure_time, arrival_time, vel_min)
 
     plt.show()
     plt.close()
